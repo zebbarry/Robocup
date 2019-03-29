@@ -15,8 +15,8 @@ void setup()
   pinMode(49, OUTPUT);                 //Pin 49 is used to enable IO power
   digitalWrite(49, 1);                 //Enable IO power on main CPU board
   
-  myservoA.attach(13);  // attaches the servo pin 13 to the servo object
-  myservoB.attach(12);  // attaches the servo pin 12 to the servo object
+  myservoA.attach(2);  // attaches the servo pin 13 to the servo object
+  myservoB.attach(3);  // attaches the servo pin 12 to the servo object
 }
 
 void loop() 
