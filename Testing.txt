@@ -1,0 +1,5 @@
+12V DC Electromagnet
+5V - 0.1A
+9V - 0.2A
+13V - 0.3A
+Works well for all but must touch weight to attach.
