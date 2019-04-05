@@ -1,0 +1,33 @@
+12V DC Electromagnet
+5V - 0.1A
+9V - 0.2A
+13V - 0.3A
+Works well for all but must touch weight to attach.
+
+
+
+
+
+Testing
+- IR sensors range and angles
+- IR sensor interferance
+- Electromagnet weight at each voltage; attach distatnce ; weight on its side, they might get knocked over
+- Torque of motors for tilting electromagnet with weight attached
+- Capacitance sensor
+- Ultrasonic sensor range and accuracy
+- Camera vision (navigate to most reflective object)?
+
+Robot design 
+  I\ 
+    \__________
+    o__________
+    /   c
+  I/
+
+O = weight
+C = capacitance sensor
+I = IR
+
+
+Motor tilts weight attached to electromagnet, through a set of paddles(?), where it slides or rolls out tof the way
+
