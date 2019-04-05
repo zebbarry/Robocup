@@ -31,3 +31,34 @@ I = IR
 
 Motor tilts weight attached to electromagnet, through a set of paddles(?), where it slides or rolls out tof the way
 
+
+IR testing
+- Bolted to sheet lying on ground using 2mm perspex perpendicular to lense.
+- Narraw field of vision, cannot detect objects marginally below it and to the sides.
+- Cant differentiate materials.
+- Pipe obstacle returned slightly lower voltage than a wall and the difference increases slightly as you move further away
+
+
+Short Range Sensor
+Dead zone at 66mm from lense with analog value of 640.
+Maximum distance at 500mm with analog value of 45-70, resting value.
+
+Stated values from datasheet: 
+Dead zone - 	40mm
+Max - 		300mm
+
+Medium Range Sensor
+Dead zone at 150mm from lense with analog value of 530.
+Maximum distance at 1150mm with analog value of 85-100, resting value.
+
+Long Range Sensor
+Dead zone at 620mm from lense with analog value of 620.
+Maximum distance at 3000mm with analog value of 200-240, resting value.
+
+
+Large ultrasound sensor testing
+ - Wide angle
+ - Minimal noise
+
+Dead zone at 340mm from base with value of 70.
+Maximum distance at 5000mm but unreliable.
