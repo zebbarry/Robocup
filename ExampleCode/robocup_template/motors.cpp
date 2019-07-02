@@ -1,12 +1,42 @@
+#include <Servo.h>                  //control the DC motors
 #include "motors.h"
 #include "Arduino.h"
+
+void motor_init(Servo motor, int pin) {
+  Serial.println("Initialise motor");
+  motor.attach(pin);
+  int velocity = check_speed_limits(STOP_SPEED);
+  
+  Serial.print("Change the motor speed to ");
+  Serial.println(velocity);
+  motor.writeMicroseconds(velocity);
+}
+
 
 /* Check whether the speed value to be written is within the maximum
  *  and minimum speed caps. Act accordingly.
  *
  */
-void check_speed_limits(/*parameters*/) {
-  Serial.println("Check the motor speed limit \n");
+int check_speed_limits(int velocity) {
+  Serial.println("Check the motor speed limit");
+  
+  if (velocity > MAX_SPEED) {
+    Serial.print("Speed too high at ");
+    Serial.print(velocity);
+    Serial.print(", capped to ");
+    Serial.println(MAX_SPEED);
+    
+    velocity = MAX_SPEED;
+  } else if (velocity < MIN_SPEED) {
+    Serial.print("Speed too low at ");
+    Serial.print(velocity);
+    Serial.print(", capped to ");
+    Serial.println(MIN_SPEED);
+    
+    velocity = MIN_SPEED;
+  }
+
+  return velocity;
 }
 
 
@@ -14,13 +44,10 @@ void check_speed_limits(/*parameters*/) {
  *It is also a good idea to check whether value to write is valid.
  *It is also a good idea to do so atomically!
  */
-void set_motor(/*parameters*/) {
+void set_motor(void) {  
+  int velocity = check_speed_limits(STOP_SPEED);
 
-  Serial.println("Change the motor speed \n");
-  
-  check_speed_limits();
-
+  Serial.print("Change the motor speed to ");
+  Serial.println(velocity);
+  motor.writeMicroseconds(velocity);
 }
-
-
-
