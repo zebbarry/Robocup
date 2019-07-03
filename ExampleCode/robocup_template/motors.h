@@ -14,6 +14,9 @@
 #define MAX_SPEED 2000             //Set the maximum speed value that can be written to the motors
 #define STOP_SPEED 1500            //Set the stop speed value that can be written to the motors
 
+extern Servo right_motor;
+extern Servo left_motor;
+extern int motor_speed;
 
 void motor_init(Servo motor, int pin);
 int check_speed_limits(int velocity);

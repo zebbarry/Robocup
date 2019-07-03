@@ -1,4 +1,6 @@
 #include <Servo.h>                  //control the DC motors
+#include <stdbool.h>
+#include <stdint.h>
 #include "motors.h"
 #include "Arduino.h"
 
@@ -44,10 +46,11 @@ int check_speed_limits(int velocity) {
  *It is also a good idea to check whether value to write is valid.
  *It is also a good idea to do so atomically!
  */
-void set_motor(void) {  
-  int velocity = check_speed_limits(STOP_SPEED);
-
+void set_motor(void) {
+  int velocity = check_speed_limits(motor_speed);
+  right_motor.writeMicroseconds(velocity);
+  left_motor.writeMicroseconds(velocity);
+  
   Serial.print("Change the motor speed to ");
   Serial.println(velocity);
-  motor.writeMicroseconds(velocity);
 }

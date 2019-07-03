@@ -25,4 +25,3 @@ void detect_base(/* Parameters */){
 void unload_weights(/* Parameters */){
   Serial.println("Unloading weights \n");
 }
-
