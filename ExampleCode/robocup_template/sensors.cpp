@@ -55,7 +55,7 @@ void read_infrared(void){
 
 // Pass in data and average the lot
 void sensor_average(void){
-  Serial.println("Averaging the sensors (L, R, F)");
+  //Serial.println("Averaging the sensors (L, R, F)");
   
   ir_averages.left = average_buf(&ir_array.left);
   ir_averages.right = average_buf(&ir_array.right);

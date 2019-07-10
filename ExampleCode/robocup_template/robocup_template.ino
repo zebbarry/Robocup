@@ -31,10 +31,10 @@
 // Task period Definitions
 // ALL OF THESE VALUES WILL NEED TO BE SET TO SOMETHING USEFUL !!!!!!!!!!!!!!!!!!!!
 #define US_READ_TASK_PERIOD                 40
-#define IR_READ_TASK_PERIOD                 2
-#define SENSOR_AVERAGE_PERIOD               200
-#define SET_MOTOR_TASK_PERIOD               200
-#define START_ROBOT_TASK_PERIOD             200
+#define IR_READ_TASK_PERIOD                 5     //
+#define SENSOR_AVERAGE_PERIOD               50   //
+#define SET_MOTOR_TASK_PERIOD               50   //
+#define START_ROBOT_TASK_PERIOD             50   //
 #define WEIGHT_SCAN_TASK_PERIOD             40
 #define COLLECT_WEIGHT_TASK_PERIOD          40
 #define CHECK_WATCHDOG_TASK_PERIOD          40
@@ -61,7 +61,8 @@
 Servo right_motor;
 Servo left_motor;
 ir_averages_t ir_averages;
-int motor_speed;
+int motor_speed_l;
+int motor_speed_r;
 
 //**********************************************************************************
 // Task Scheduler and Tasks
@@ -132,6 +133,8 @@ void pin_init(){
 //**********************************************************************************
 void robot_init() {
     Serial.println("Robot is ready \n");
+    motor_speed_l = MAX_SPEED;
+    motor_speed_r = MAX_SPEED;
 }
 
 //**********************************************************************************

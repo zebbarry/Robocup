@@ -8,11 +8,11 @@
 #include <stdint.h>
 #include <CircularBuffer.h>
 
-#define NUM_IR_SENSORS      3
+#define NUM_IR_SENS         3
 #define IR_SHORT_LEFT_PIN   A0
 #define IR_SHORT_RIGHT_PIN  A1
 #define IR_SHORT_FRONT_PIN  A2
-#define IR_BUF_SIZE         100
+#define IR_BUF_SIZE         20
 
 typedef  struct {
   CircularBuffer<int, IR_BUF_SIZE> left;

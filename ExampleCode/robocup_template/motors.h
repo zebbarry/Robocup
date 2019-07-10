@@ -16,7 +16,8 @@
 
 extern Servo right_motor;
 extern Servo left_motor;
-extern int motor_speed;
+extern int motor_speed_l;
+extern int motor_speed_r;
 
 void motor_init(Servo motor, int pin);
 int check_speed_limits(int velocity);

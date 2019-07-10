@@ -47,10 +47,14 @@ int check_speed_limits(int velocity) {
  *It is also a good idea to do so atomically!
  */
 void set_motor(void) {
-  int velocity = check_speed_limits(motor_speed);
-  right_motor.writeMicroseconds(velocity);
-  left_motor.writeMicroseconds(velocity);
+  int vel_l = check_speed_limits(motor_speed_l);
+  int vel_r = check_speed_limits(motor_speed_r);
+  left_motor.writeMicroseconds(vel_l);
+  right_motor.writeMicroseconds(vel_r);
   
-  Serial.print("Change the motor speed to ");
-  Serial.println(velocity);
+  Serial.print("Change the motor speed to (L, R) (");
+  Serial.print(vel_l);
+  Serial.print(", ");
+  Serial.print(vel_r);
+  Serial.println(") \n");
 }
