@@ -8,11 +8,14 @@
 #include <stdint.h>
 #include <CircularBuffer.h>
 
-#define NUM_IR_SENS         3
 #define IR_SHORT_LEFT_PIN   A0
 #define IR_SHORT_RIGHT_PIN  A1
 #define IR_SHORT_FRONT_PIN  A2
-#define IR_BUF_SIZE         20
+#define IR_BUF_SIZE         30
+
+
+enum dir {LEFT = 0, RIGHT, FRONT, NUM_IR_SENS};
+enum ir_type {SHORT = 0, MEDIUM, LONG};
 
 typedef  struct {
   CircularBuffer<int, IR_BUF_SIZE> left;
@@ -31,6 +34,9 @@ extern ir_averages_t ir_averages;
 void infrared_init(void);
 
 int average_buf(CircularBuffer<int, IR_BUF_SIZE>* buf);
+
+// Convert analog value to mm
+int convert_ir_dist(int analog, enum ir_type type);
 
 // Read ultrasonic value
 void read_ultrasonic(/* Parameters */);

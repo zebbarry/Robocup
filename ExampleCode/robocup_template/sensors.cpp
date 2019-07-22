@@ -33,6 +33,30 @@ int average_buf(CircularBuffer<int, IR_BUF_SIZE>* buf) {
 }
 
 
+// Convert analog value to mm
+int convert_ir_dist(int analog, enum ir_type type) {
+  int dist_mm;
+  
+  switch(type) {
+    case SHORT:
+    dist_mm = 18684*pow(analog, -0.952);  // Derived from excel using experimental data.
+    if (dist_mm < 0 || dist_mm > 25000) {
+      dist_mm = 25000;
+    }
+    break;
+    
+    case MEDIUM:
+    dist_mm = 247397*pow(analog, -1.135);  // Derived from excel using experimental data.
+    if (dist_mm < 0 || dist_mm > 25000) {
+      dist_mm = 25000;
+    }
+    break;
+  }
+  
+  return dist_mm;
+}
+
+
 // Read ultrasonic value
 void read_ultrasonic(/* Parameters */){
   Serial.println("Ultrasonic value \n");
@@ -57,12 +81,20 @@ void read_infrared(void){
 void sensor_average(void){
   //Serial.println("Averaging the sensors (L, R, F)");
   
-  ir_averages.left = average_buf(&ir_array.left);
-  ir_averages.right = average_buf(&ir_array.right);
-  ir_averages.front = average_buf(&ir_array.front);
+  int actual = average_buf(&ir_array.left);
+  ir_averages.left = convert_ir_dist(actual, SHORT);
   
-  Serial.println(ir_averages.left);
-  Serial.println(ir_averages.right);
+  actual = average_buf(&ir_array.right);
+  ir_averages.right = convert_ir_dist(actual, SHORT);
+  
+  actual = average_buf(&ir_array.front);
+  ir_averages.front = convert_ir_dist(actual, MEDIUM);
+  
+  //Serial.println(ir_averages.left);
+  //Serial.println(ir_averages.right);
+  Serial.print("Sensor Value = ");
+  Serial.print(actual);
+  Serial.print("\t Dist Value = ");
   Serial.println(ir_averages.front);
-  Serial.println();
+  //Serial.println();
 }

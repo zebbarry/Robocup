@@ -31,8 +31,8 @@
 // Task period Definitions
 // ALL OF THESE VALUES WILL NEED TO BE SET TO SOMETHING USEFUL !!!!!!!!!!!!!!!!!!!!
 #define US_READ_TASK_PERIOD                 40
-#define IR_READ_TASK_PERIOD                 10+     //
-#define SENSOR_AVERAGE_PERIOD               50   //
+#define IR_READ_TASK_PERIOD                 10   //
+#define SENSOR_AVERAGE_PERIOD               100   //
 #define SET_MOTOR_TASK_PERIOD               50   //
 #define START_ROBOT_TASK_PERIOD             50   //
 #define WEIGHT_SCAN_TASK_PERIOD             40
@@ -161,8 +161,8 @@ void task_init() {
 //  tRead_ultrasonic.enable();
   tRead_infrared.enable();
   tSensor_average.enable();
-  tSet_motor.enable();
-  tStart_robot.enable();
+//  tSet_motor.enable();
+//  tStart_robot.enable();
 //  tWeight_scan.enable();
 //  tCollect_weight.enable();
 //  tCheck_watchdog.enable();
@@ -177,6 +177,5 @@ void task_init() {
 // put your main code here, to run repeatedly
 //**********************************************************************************
 void loop() {
-  
   taskManager.execute();    //execute the scheduler
 }

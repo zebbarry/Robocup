@@ -13,8 +13,6 @@
 
 // Local definitions
 
-enum dir {LEFT = 0, RIGHT, FRONT};
-
 // Start robot sequence
 void start_robot(void){
   Serial.println("Checking directions \n");

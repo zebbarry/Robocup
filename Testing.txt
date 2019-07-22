@@ -5,7 +5,7 @@
 Works well for all but must touch weight to attach.
 
 
-
+5/1024 - qunatisation error
 
 
 Testing
