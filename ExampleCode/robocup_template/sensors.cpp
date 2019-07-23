@@ -40,15 +40,15 @@ int convert_ir_dist(int analog, enum ir_type type) {
   switch(type) {
     case SHORT:
     dist_mm = 18684*pow(analog, -0.952);  // Derived from excel using experimental data.
-    if (dist_mm < 0 || dist_mm > 25000) {
-      dist_mm = 25000;
+    if (analog < 40) {
+      dist_mm = 557;
     }
     break;
     
     case MEDIUM:
-    dist_mm = 247397*pow(analog, -1.135);  // Derived from excel using experimental data.
-    if (dist_mm < 0 || dist_mm > 25000) {
-      dist_mm = 25000;
+    dist_mm = 213184*pow(analog, -1.125);  // Derived from excel using experimental data.
+    if (analog < 70) {
+      dist_mm = 1790;
     }
     break;
   }
