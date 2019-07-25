@@ -32,7 +32,7 @@
 // ALL OF THESE VALUES WILL NEED TO BE SET TO SOMETHING USEFUL !!!!!!!!!!!!!!!!!!!!
 #define US_READ_TASK_PERIOD                 40
 #define IR_READ_TASK_PERIOD                 10   //
-#define SENSOR_AVERAGE_PERIOD               100   //
+#define SENSOR_AVERAGE_PERIOD               50   //
 #define SET_MOTOR_TASK_PERIOD               50   //
 #define START_ROBOT_TASK_PERIOD             50   //
 #define WEIGHT_SCAN_TASK_PERIOD             40
@@ -72,7 +72,7 @@ int motor_speed_r;
    (-1 means indefinitely), third one is the callback function */
 
 // Tasks for reading sensors 
-Task tRead_ultrasonic(US_READ_TASK_PERIOD,       US_READ_TASK_NUM_EXECUTE,        &read_ultrasonic);
+Task tRead_ultrasonic(US_READ_TASK_PERIOD,       US_READ_TASK_NUM_EXECUTE,        &send_ultrasonic);
 Task tRead_infrared(IR_READ_TASK_PERIOD,         IR_READ_TASK_NUM_EXECUTE,        &read_infrared);
 Task tSensor_average(SENSOR_AVERAGE_PERIOD,      SENSOR_AVERAGE_NUM_EXECUTE,      &sensor_average);
 
@@ -161,8 +161,8 @@ void task_init() {
 //  tRead_ultrasonic.enable();
   tRead_infrared.enable();
   tSensor_average.enable();
-//  tSet_motor.enable();
-//  tStart_robot.enable();
+  tSet_motor.enable();
+  tStart_robot.enable();
 //  tWeight_scan.enable();
 //  tCollect_weight.enable();
 //  tCheck_watchdog.enable();

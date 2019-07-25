@@ -39,7 +39,7 @@ int average_buf(CircularBuffer<int, IR_BUF_SIZE>* buf);
 int convert_ir_dist(int analog, enum ir_type type);
 
 // Read ultrasonic value
-void read_ultrasonic(/* Parameters */);
+void send_ultrasonic(/* Parameters */);
 
 // Read infrared value
 void read_infrared(void);
