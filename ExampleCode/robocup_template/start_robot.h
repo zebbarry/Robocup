@@ -10,7 +10,7 @@
 #define RIGHT_LIMIT 350
 #define FRONT_LIMIT 200
 #define DESIRED_LIM 300
-#define STEP        5 
+#define STEP        10
 #define FORWARD_FULL 2000
 #define FORWARD_SLOW 1700
 #define BACK_FULL    1000

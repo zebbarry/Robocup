@@ -14,21 +14,21 @@
 // Local definitions
 ir_array_t ir_array;
 
-void infrared_init(void) {
-  Serial.println("Initialise infrared sensors \n");
+void sensor_init(void) {
+  Serial.println("Initialise sensors \n");
   pinMode(IR_SHORT_LEFT_PIN, INPUT);
   pinMode(IR_SHORT_RIGHT_PIN, INPUT);
   pinMode(IR_SHORT_FRONT_PIN, INPUT);
+  pinMode(INDUCTIVE_PIN, INPUT_PULLUP);
+  pinMode(US_TRIG_PIN, OUTPUT);
 }
 
 
 int average_buf(CircularBuffer<int, IR_BUF_SIZE>* buf) {
   int sum = 0;
-
   for (int i = 0; i < buf->size()-1; i++) {
     sum += buf[0][i];
   }
-  
   return (2*sum + buf->size()) / 2 / buf->size();
 }
 
@@ -36,7 +36,6 @@ int average_buf(CircularBuffer<int, IR_BUF_SIZE>* buf) {
 // Convert analog value to mm
 int convert_ir_dist(int analog, enum ir_type type) {
   int dist_mm;
-  
   switch(type) {
     case SHORT:
     dist_mm = 18684*pow(analog, -0.952);  // Derived from excel using experimental data.
@@ -52,26 +51,32 @@ int convert_ir_dist(int analog, enum ir_type type) {
     }
     break;
   }
-  
   return dist_mm;
 }
 
 
 // Send ultrasonic value
-void send_ultrasonic(/* Parameters */){
-  Serial.println("Ultrasonic value \n");
+void send_ultrasonic(void){
+  Serial.println("Sending offensive ultrasonic pulse \n");
+  static bool state = false;
+  if (state) {
+    digitalWrite(US_TRIG_PIN, HIGH);
+  } else {
+    digitalWrite(US_TRIG_PIN, LOW);
+  }
 }
 
 
 // Read infrared value
 void read_infrared(void){
   //Serial.println("Read infrared values \n");
-  
   int sensorVal;
   sensorVal = analogRead(IR_SHORT_LEFT_PIN);
   ir_array.left.push(sensorVal);
+  
   sensorVal = analogRead(IR_SHORT_RIGHT_PIN);
   ir_array.right.push(sensorVal);
+  
   sensorVal = analogRead(IR_SHORT_FRONT_PIN);
   ir_array.front.push(sensorVal);
 }
@@ -93,5 +98,4 @@ void sensor_average(void){
   Serial.println(ir_averages.left);
   Serial.println(ir_averages.right);
   Serial.println(ir_averages.front);
-  //Serial.println();
 }

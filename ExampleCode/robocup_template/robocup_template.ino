@@ -30,11 +30,11 @@
 
 // Task period Definitions
 // ALL OF THESE VALUES WILL NEED TO BE SET TO SOMETHING USEFUL !!!!!!!!!!!!!!!!!!!!
-#define US_READ_TASK_PERIOD                 40
+#define US_SEND_TASK_PERIOD                 100
 #define IR_READ_TASK_PERIOD                 10   //
-#define SENSOR_AVERAGE_PERIOD               50   //
-#define SET_MOTOR_TASK_PERIOD               50   //
-#define START_ROBOT_TASK_PERIOD             50   //
+#define SENSOR_AVERAGE_PERIOD               100   //
+#define SET_MOTOR_TASK_PERIOD               100   //
+#define START_ROBOT_TASK_PERIOD             100   //
 #define WEIGHT_SCAN_TASK_PERIOD             40
 #define COLLECT_WEIGHT_TASK_PERIOD          40
 #define CHECK_WATCHDOG_TASK_PERIOD          40
@@ -42,7 +42,7 @@
 
 // Task execution amount definitions
 // -1 means indefinitely
-#define US_READ_TASK_NUM_EXECUTE           -1
+#define US_SEND_TASK_NUM_EXECUTE           -1
 #define IR_READ_TASK_NUM_EXECUTE           -1
 #define SENSOR_AVERAGE_NUM_EXECUTE         -1
 #define SET_MOTOR_TASK_NUM_EXECUTE         -1
@@ -72,7 +72,7 @@ int motor_speed_r;
    (-1 means indefinitely), third one is the callback function */
 
 // Tasks for reading sensors 
-Task tRead_ultrasonic(US_READ_TASK_PERIOD,       US_READ_TASK_NUM_EXECUTE,        &send_ultrasonic);
+Task tSend_ultrasonic(US_SEND_TASK_PERIOD,       US_SEND_TASK_NUM_EXECUTE,        &send_ultrasonic);
 Task tRead_infrared(IR_READ_TASK_PERIOD,         IR_READ_TASK_NUM_EXECUTE,        &read_infrared);
 Task tSensor_average(SENSOR_AVERAGE_PERIOD,      SENSOR_AVERAGE_NUM_EXECUTE,      &sensor_average);
 
@@ -125,7 +125,7 @@ void pin_init(){
     motor_init(right_motor, RIGHT_MOTOR_PIN);
     motor_init(left_motor, LEFT_MOTOR_PIN);
 
-    infrared_init();
+    sensor_init();
 }
 
 //**********************************************************************************
@@ -146,7 +146,7 @@ void task_init() {
   taskManager.init();     
  
   // Add tasks to the scheduler
-  taskManager.addTask(tRead_ultrasonic);   //reading ultrasonic 
+  taskManager.addTask(tSend_ultrasonic);   //reading ultrasonic 
   taskManager.addTask(tRead_infrared);
   taskManager.addTask(tSensor_average);
   taskManager.addTask(tSet_motor);
@@ -158,7 +158,7 @@ void task_init() {
 //  taskManager.addTask(tVictory_dance);      
 
   // Enable the tasks
-//  tRead_ultrasonic.enable();
+  tSend_ultrasonic.enable();
   tRead_infrared.enable();
   tSensor_average.enable();
   tSet_motor.enable();

@@ -13,6 +13,9 @@
 #define IR_SHORT_FRONT_PIN  A2
 #define IR_BUF_SIZE         30
 
+#define INDUCTIVE_PIN       38
+#define US_TRIG_PIN         10
+
 
 enum dir {LEFT = 0, RIGHT, FRONT, NUM_IR_SENS};
 enum ir_type {SHORT = 0, MEDIUM, LONG};
@@ -31,7 +34,7 @@ typedef  struct {
 
 extern ir_averages_t ir_averages;
 
-void infrared_init(void);
+void sensor_init(void);
 
 int average_buf(CircularBuffer<int, IR_BUF_SIZE>* buf);
 
@@ -39,7 +42,7 @@ int average_buf(CircularBuffer<int, IR_BUF_SIZE>* buf);
 int convert_ir_dist(int analog, enum ir_type type);
 
 // Read ultrasonic value
-void send_ultrasonic(/* Parameters */);
+void send_ultrasonic(void);
 
 // Read infrared value
 void read_infrared(void);

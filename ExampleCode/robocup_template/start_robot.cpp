@@ -21,18 +21,18 @@ void start_robot(void){
   if (ir_averages.front < FRONT_LIMIT) {    // Object in front
     Serial.println("Object in front \n");
     if (ir_averages.left < LEFT_LIMIT && ir_averages.right < RIGHT_LIMIT) { // Cornered
-    Serial.println("Cornered \n");
+      Serial.println("Cornered \n");
       // Back up and turn around
       motor_speed_l = BACK_FULL;
       motor_speed_r = BACK_FULL;
     } else if (ir_averages.left < ir_averages.right) {   // Object also to the left
-    Serial.println("Object to the left \n");
+      Serial.println("Object to the left \n");
       // Turn right
       motor_speed_l = FORWARD_SLOW;
       motor_speed_r = BACK_SLOW;
       
     } else {  // Object to right
-    Serial.println("Object to the right \n");
+      Serial.println("Object to the right \n");
       // Turn left
       motor_speed_l = BACK_SLOW;
       motor_speed_r = FORWARD_SLOW;
@@ -40,18 +40,26 @@ void start_robot(void){
     
   } else {
     if (ir_averages.left > LEFT_LIMIT && ir_averages.right > RIGHT_LIMIT) {   // No walls in sight
-    Serial.println("No objects in sight \n");
-      motor_speed_l = FORWARD_FULL;
-      motor_speed_r = FORWARD_FULL;
+      Serial.println("No objects in sight \n");
+      if (ir_averages.left > ir_averages.right) { // Closer to the left
+        Serial.println("Closer to the left \n");
+        motor_speed_l = FORWARD_SLOW;
+        motor_speed_r = FORWARD_FULL;
+        
+      } else {
+        Serial.println("Closer to the right \n");
+        motor_speed_l = FORWARD_FULL;
+        motor_speed_r = FORWARD_SLOW;
+      }
       
     } else if (ir_averages.left < LEFT_LIMIT) { // Wall to left
-    Serial.println("Object to the left \n");
+      Serial.println("Object to the left \n");
       // Turn right a little bit
       motor_speed_l += STEP;
       motor_speed_r -= STEP;
       
     } else if (ir_averages.right < RIGHT_LIMIT) {
-    Serial.println("Object to the right \n");
+      Serial.println("Object to the right \n");
       // Turn left a little bit
       motor_speed_l -= STEP;
       motor_speed_r += STEP;

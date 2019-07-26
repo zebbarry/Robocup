@@ -20,8 +20,6 @@ void motor_init(Servo motor, int pin) {
  *
  */
 int check_speed_limits(int velocity) {
-  Serial.println("Check the motor speed limit");
-  
   if (velocity > MAX_SPEED) {
     Serial.print("Speed too high at ");
     Serial.print(velocity);
@@ -47,14 +45,15 @@ int check_speed_limits(int velocity) {
  *It is also a good idea to do so atomically!
  */
 void set_motor(void) {
-  int vel_l = check_speed_limits(motor_speed_l);
-  int vel_r = check_speed_limits(motor_speed_r);
-  left_motor.writeMicroseconds(vel_l);
-  right_motor.writeMicroseconds(vel_r);
+  Serial.println("Check the motor speed limit");
+  motor_speed_l = check_speed_limits(motor_speed_l);
+  motor_speed_r = check_speed_limits(motor_speed_r);
+  left_motor.writeMicroseconds(motor_speed_l);
+  right_motor.writeMicroseconds(motor_speed_r);
   
   Serial.print("Change the motor speed to (L, R) (");
-  Serial.print(vel_l);
+  Serial.print(motor_speed_l);
   Serial.print(", ");
-  Serial.print(vel_r);
+  Serial.print(motor_speed_r);
   Serial.println(") \n");
 }
