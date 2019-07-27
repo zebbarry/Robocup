@@ -22,6 +22,6 @@ extern int motor_speed_r;
 void motor_init(Servo motor, int pin);
 int check_speed_limits(int velocity);
 void set_motor(void);
-
+void drive_step(int steps, int step_pin);
 
 #endif /* MOTORS_H_ */

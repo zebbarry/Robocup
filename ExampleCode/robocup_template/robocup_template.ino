@@ -30,13 +30,13 @@
 
 // Task period Definitions
 // ALL OF THESE VALUES WILL NEED TO BE SET TO SOMETHING USEFUL !!!!!!!!!!!!!!!!!!!!
-#define US_SEND_TASK_PERIOD                 100
-#define IR_READ_TASK_PERIOD                 10   //
-#define SENSOR_AVERAGE_PERIOD               100   //
-#define SET_MOTOR_TASK_PERIOD               100   //
-#define START_ROBOT_TASK_PERIOD             100   //
-#define WEIGHT_SCAN_TASK_PERIOD             40
-#define COLLECT_WEIGHT_TASK_PERIOD          40
+#define US_SEND_TASK_PERIOD                 500
+#define IR_READ_TASK_PERIOD                 20   //
+#define SENSOR_AVERAGE_PERIOD               150   //
+#define SET_MOTOR_TASK_PERIOD               150   //
+#define START_ROBOT_TASK_PERIOD             150   //
+#define WEIGHT_SCAN_TASK_PERIOD             200
+#define COLLECT_WEIGHT_TASK_PERIOD          200
 #define CHECK_WATCHDOG_TASK_PERIOD          40
 #define VICTORY_DANCE_TASK_PERIOD           40
 
@@ -50,7 +50,7 @@
 #define WEIGHT_SCAN_TASK_NUM_EXECUTE       -1
 #define COLLECT_WEIGHT_TASK_NUM_EXECUTE    -1
 #define CHECK_WATCHDOG_TASK_NUM_EXECUTE    -1
-#define VICTORY_DANCE_TASK_NUM_EXECUTE     -1
+#define VICTORY_DANCE_TASK_NUM_EXECUTE     1
 
 // Pin definitions
 #define IO_POWER  49
@@ -88,7 +88,7 @@ Task tCollect_weight(COLLECT_WEIGHT_TASK_PERIOD, COLLECT_WEIGHT_TASK_NUM_EXECUTE
 
 // Tasks to check the 'watchdog' timer (These will need to be added in)
 //Task tCheck_watchdog(CHECK_WATCHDOG_TASK_PERIOD, CHECK_WATCHDOG_TASK_NUM_EXECUTE, &check_watchdog);
-//Task tVictory_dance(VICTORY_DANCE_TASK_PERIOD,   VICTORY_DANCE_TASK_NUM_EXECUTE,  &victory_dance);
+Task tVictory_dance(VICTORY_DANCE_TASK_PERIOD,   VICTORY_DANCE_TASK_NUM_EXECUTE,  &victory_dance);
 
 Scheduler taskManager;
 
@@ -125,6 +125,8 @@ void pin_init(){
     motor_init(right_motor, RIGHT_MOTOR_PIN);
     motor_init(left_motor, LEFT_MOTOR_PIN);
 
+    pinMode(MAG_PIN, OUTPUT);
+    digitalWrite(MAG_PIN, LOW);
     sensor_init();
 }
 
@@ -163,8 +165,8 @@ void task_init() {
   tSensor_average.enable();
   tSet_motor.enable();
   tStart_robot.enable();
-//  tWeight_scan.enable();
-//  tCollect_weight.enable();
+  tWeight_scan.enable();
+  tCollect_weight.enable();
 //  tCheck_watchdog.enable();
 //  tVictory_dance.enable();
 

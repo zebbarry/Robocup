@@ -11,9 +11,9 @@
 #define IR_SHORT_LEFT_PIN   A0
 #define IR_SHORT_RIGHT_PIN  A1
 #define IR_SHORT_FRONT_PIN  A2
-#define IR_BUF_SIZE         30
+#define IR_BUF_SIZE         20
 
-#define INDUCTIVE_PIN       38
+#define INDUCTIVE_PIN       42
 #define US_TRIG_PIN         10
 
 

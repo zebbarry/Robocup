@@ -69,7 +69,6 @@ void send_ultrasonic(void){
 
 // Read infrared value
 void read_infrared(void){
-  //Serial.println("Read infrared values \n");
   int sensorVal;
   sensorVal = analogRead(IR_SHORT_LEFT_PIN);
   ir_array.left.push(sensorVal);
@@ -84,7 +83,7 @@ void read_infrared(void){
 
 // Pass in data and average the lot
 void sensor_average(void){
-  Serial.println("Averaging the sensors (L, R, F)");
+  Serial.print("Averaging the sensors (L, R, F) ");
   
   int actual = average_buf(&ir_array.left);
   ir_averages.left = convert_ir_dist(actual, SHORT);
@@ -95,7 +94,9 @@ void sensor_average(void){
   actual = average_buf(&ir_array.front);
   ir_averages.front = convert_ir_dist(actual, SHORT);
   
-  Serial.println(ir_averages.left);
-  Serial.println(ir_averages.right);
+  Serial.print(ir_averages.left);
+  Serial.print(" ");
+  Serial.print(ir_averages.right);
+  Serial.print(" ");
   Serial.println(ir_averages.front);
 }

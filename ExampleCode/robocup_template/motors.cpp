@@ -57,3 +57,15 @@ void set_motor(void) {
   Serial.print(motor_speed_r);
   Serial.println(") \n");
 }
+
+
+
+void drive_step(int steps, int step_pin) {
+  int i = 0;
+  for (i = 0; i < steps; i++) {
+    digitalWrite(step_pin,LOW);
+    delayMicroseconds(2);
+    digitalWrite(step_pin,HIGH);
+    delay(1);
+  }
+}
