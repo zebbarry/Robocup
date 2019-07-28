@@ -65,6 +65,7 @@ Servo left_motor;
 ir_averages_t ir_averages;
 int motor_speed_l;
 int motor_speed_r;
+int current_pos;
 bool collection_complete;
 bool collection_mode;
 bool state_change;
@@ -176,13 +177,13 @@ void task_init() {
   taskManager.addTask(tVictory_dance);      
 
   // Enable the tasks
-//  tSend_ultrasonic.enable();
+  tSend_ultrasonic.enable();
   tRead_infrared.enable();
   tSensor_average.enable();
-  tSet_motor.enable();
-  tStart_robot.enable();
-//  tWeight_scan.enable();
-//  tCollect_weight.enable();
+//  tSet_motor.enable();
+//  tStart_robot.enable();
+  tWeight_scan.enable();
+  tCollect_weight.enable();
 //  tCheck_watchdog.enable();
 //  tVictory_dance.enable();
 

@@ -47,15 +47,14 @@ void collect_weight(void)
       #endif
       digitalWrite(MAG_PIN, HIGH);
       delay(500);
-      drive_step(STEPS, STEP_PIN);
+      drive_step(STEPS, STEP_PIN, DIR_PIN, UP);
       induct_state = digitalRead(INDUCTIVE_PIN);
+      
       if (!induct_state) {
         #if DEBUG
         Serial.println("Inductive not active \n");
         #endif
-        digitalWrite(DIR_PIN, HIGH);
-        drive_step(STEPS, STEP_PIN);
-        digitalWrite(DIR_PIN, LOW);
+        drive_step(STEPS, STEP_PIN, DIR_PIN, DOWN);
         weight_state = NO_WEIGHT;
       } else {
         collection_complete = true;
@@ -76,11 +75,9 @@ void victory_dance(void) {
   #endif
   digitalWrite(FAN_PIN, HIGH);
   delay(5000);
-  digitalWrite(DIR_PIN, HIGH);
-  drive_step(STEPS, STEP_PIN);
-  digitalWrite(DIR_PIN, LOW);
+  drive_step(STEPS, STEP_PIN, DIR_PIN, DOWN);
   digitalWrite(MAG_PIN, LOW);
   digitalWrite(FAN_PIN, LOW);
-  delay(100);
+  delay(1000);
   collection_complete = false;
 }
