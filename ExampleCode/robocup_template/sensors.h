@@ -15,6 +15,7 @@
 
 #define INDUCTIVE_PIN       42
 #define US_TRIG_PIN         10
+#define LIMIT_PIN 36
 
 
 enum dir {LEFT = 0, RIGHT, FRONT, NUM_IR_SENS};
@@ -33,6 +34,10 @@ typedef  struct {
 } ir_averages_t;
 
 extern ir_averages_t ir_averages;
+
+extern bool collection_complete;
+extern bool collection_mode;
+extern bool state_change;
 
 void sensor_init(void);
 

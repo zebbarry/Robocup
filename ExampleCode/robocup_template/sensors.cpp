@@ -10,12 +10,15 @@
 #include "sensors.h"
 #include "Arduino.h"
 #include <CircularBuffer.h>
+#include "debug.h"
 
 // Local definitions
 ir_array_t ir_array;
 
 void sensor_init(void) {
+  #if DEBUG
   Serial.println("Initialise sensors \n");
+  #endif
   pinMode(IR_SHORT_LEFT_PIN, INPUT);
   pinMode(IR_SHORT_RIGHT_PIN, INPUT);
   pinMode(IR_SHORT_FRONT_PIN, INPUT);
@@ -57,7 +60,10 @@ int convert_ir_dist(int analog, enum ir_type type) {
 
 // Send ultrasonic value
 void send_ultrasonic(void){
+  #if DEBUG
   Serial.println("Sending offensive ultrasonic pulse \n");
+  #endif
+  
   static bool state = false;
   if (state) {
     digitalWrite(US_TRIG_PIN, HIGH);
@@ -83,7 +89,6 @@ void read_infrared(void){
 
 // Pass in data and average the lot
 void sensor_average(void){
-  Serial.print("Averaging the sensors (L, R, F) ");
   
   int actual = average_buf(&ir_array.left);
   ir_averages.left = convert_ir_dist(actual, SHORT);
@@ -94,9 +99,27 @@ void sensor_average(void){
   actual = average_buf(&ir_array.front);
   ir_averages.front = convert_ir_dist(actual, SHORT);
   
+  #if DEBUG
+  Serial.print("Averaging the sensors (L, R, F) ");
   Serial.print(ir_averages.left);
   Serial.print(" ");
   Serial.print(ir_averages.right);
   Serial.print(" ");
   Serial.println(ir_averages.front);
+  #endif
+  
+   static int limit_1, limit_2, limit_3;
+  
+   limit_3 = limit_2;
+   limit_2 = limit_1;
+   limit_1 = !digitalRead(LIMIT_PIN);
+   
+   if (!limit_3 && !limit_2 && limit_1) {
+    #if DEBUG
+    Serial.println("Changing mode -----------------");
+    Serial.println(collection_mode);
+    #endif
+    collection_mode = !collection_mode;
+    state_change = true;
+   }
 }

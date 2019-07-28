@@ -23,6 +23,8 @@
 #include "sensors.h"
 #include "weight_collection.h" 
 #include "start_robot.h"
+#include "debug.h"
+#include "stepper.h"
 
 //**********************************************************************************
 // Local Definitions
@@ -38,7 +40,7 @@
 #define WEIGHT_SCAN_TASK_PERIOD             200
 #define COLLECT_WEIGHT_TASK_PERIOD          200
 #define CHECK_WATCHDOG_TASK_PERIOD          40
-#define VICTORY_DANCE_TASK_PERIOD           40
+#define VICTORY_DANCE_TASK_PERIOD           200
 
 // Task execution amount definitions
 // -1 means indefinitely
@@ -50,7 +52,7 @@
 #define WEIGHT_SCAN_TASK_NUM_EXECUTE       -1
 #define COLLECT_WEIGHT_TASK_NUM_EXECUTE    -1
 #define CHECK_WATCHDOG_TASK_NUM_EXECUTE    -1
-#define VICTORY_DANCE_TASK_NUM_EXECUTE     1
+#define VICTORY_DANCE_TASK_NUM_EXECUTE     -1
 
 // Pin definitions
 #define IO_POWER  49
@@ -63,6 +65,9 @@ Servo left_motor;
 ir_averages_t ir_averages;
 int motor_speed_l;
 int motor_speed_r;
+bool collection_complete;
+bool collection_mode;
+bool state_change;
 
 //**********************************************************************************
 // Task Scheduler and Tasks
@@ -115,28 +120,39 @@ void setup() {
 // Set as high or low
 //**********************************************************************************
 void pin_init(){
-    
-    Serial.println("Pins have been initialised \n"); 
-
     pinMode(IO_POWER, OUTPUT);              //Pin 49 is used to enable IO power
     digitalWrite(IO_POWER, 1);              //Enable IO power on main CPU board
 
     // Initialise left and right drive motor pins
     motor_init(right_motor, RIGHT_MOTOR_PIN);
     motor_init(left_motor, LEFT_MOTOR_PIN);
+    stepper_init(DIR_PIN, STEP_PIN);
 
     pinMode(MAG_PIN, OUTPUT);
     digitalWrite(MAG_PIN, LOW);
+    pinMode(FAN_PIN, OUTPUT);
+    digitalWrite(FAN_PIN, LOW);
+    pinMode(LIMIT_PIN, INPUT);
     sensor_init();
+    
+    #if DEBUG
+    Serial.println("Pins have been initialised \n"); 
+    #endif
 }
 
 //**********************************************************************************
 // Set default robot state
 //**********************************************************************************
 void robot_init() {
+    #if DEBUG
     Serial.println("Robot is ready \n");
+    #endif
+    
     motor_speed_l = MAX_SPEED;
     motor_speed_r = MAX_SPEED;
+    collection_complete = false;
+    collection_mode = true;
+    state_change = true;
 }
 
 //**********************************************************************************
@@ -157,20 +173,23 @@ void task_init() {
   taskManager.addTask(tCollect_weight);
 
 //  taskManager.addTask(tCheck_watchdog);
-//  taskManager.addTask(tVictory_dance);      
+  taskManager.addTask(tVictory_dance);      
 
   // Enable the tasks
-  tSend_ultrasonic.enable();
+//  tSend_ultrasonic.enable();
   tRead_infrared.enable();
   tSensor_average.enable();
   tSet_motor.enable();
   tStart_robot.enable();
-  tWeight_scan.enable();
-  tCollect_weight.enable();
+//  tWeight_scan.enable();
+//  tCollect_weight.enable();
 //  tCheck_watchdog.enable();
 //  tVictory_dance.enable();
 
- Serial.println("Tasks have been initialised \n");
+
+  #if DEBUG 
+  Serial.println("Tasks have been initialised \n");
+  #endif
 }
 
 
@@ -179,5 +198,27 @@ void task_init() {
 // put your main code here, to run repeatedly
 //**********************************************************************************
 void loop() {
+  if (collection_complete) {
+    tVictory_dance.enable();
+  } else {
+    tVictory_dance.disable();
+  }
+
+  if (collection_mode && state_change) {
+    left_motor.writeMicroseconds(STOP_SPEED);
+    right_motor.writeMicroseconds(STOP_SPEED);
+    tSet_motor.disable();
+    tStart_robot.disable();
+    tWeight_scan.enable();
+    tCollect_weight.enable();
+    state_change = false;
+  } else if (state_change) {
+    tSet_motor.enable();
+    tStart_robot.enable();
+    tWeight_scan.disable();
+    tCollect_weight.disable();
+    state_change = false;
+  }
+  
   taskManager.execute();    //execute the scheduler
 }

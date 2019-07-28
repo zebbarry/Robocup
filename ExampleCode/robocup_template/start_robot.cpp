@@ -10,36 +10,41 @@
 #include "motors.h"
 #include "sensors.h"
 #include "Arduino.h"
+#include "debug.h"
 
 // Local definitions
 int32_t error_int, error_prev;
 
 // Start robot sequence
 void start_robot(void){
+  #if DEBUG
   Serial.println("Checking directions");
-  static bool i = false;
-  if (i) {
-    digitalWrite(33, HIGH);
-  } else {
-    digitalWrite(33, LOW);
-  }
-  i = !i;
+  #endif
 
   if (ir_averages.front < FRONT_LIMIT) {    // Object in front
+    #if DEBUG
     Serial.println("Object in front");
+    #endif
     if (ir_averages.left < LEFT_LIMIT && ir_averages.right < RIGHT_LIMIT) { // Cornered
+      #if DEBUG
       Serial.println("Cornered \n");
+      #endif
       // Back up and turn around
       motor_speed_l = BACK_SLOW;
       motor_speed_r = BACK_SLOW;
+      
     } else if (ir_averages.left < ir_averages.right) {   // Object also to the left
+      #if DEBUG
       Serial.println("Object also to the left \n");
+      #endif
       // Turn right
       motor_speed_l = FORWARD_SLOW;
       motor_speed_r = BACK_SLOW;
       
     } else {  // Object to right
+      #if DEBUG
       Serial.println("Object also to the right \n");
+      #endif
       // Turn left
       motor_speed_l = BACK_SLOW;
       motor_speed_r = FORWARD_SLOW;
@@ -47,43 +52,56 @@ void start_robot(void){
     
   } else {
     if (ir_averages.left > LEFT_LIMIT && ir_averages.right > RIGHT_LIMIT) {   // No walls in sight
+      #if DEBUG
       Serial.println("No walls too close");
+      #endif
       if (ir_averages.left < ir_averages.right) { // Closer to the left
+        #if DEBUG
         Serial.println("Closer to the left \n");
+        #endif
         motor_speed_l = FORWARD_FULL - 10*STEP;
         motor_speed_r = FORWARD_FULL;
         
       } else if (ir_averages.left > ir_averages.right) {
+        #if DEBUG
         Serial.println("Closer to the right \n");
+        #endif
         motor_speed_l = FORWARD_FULL;
         motor_speed_r = FORWARD_FULL - 10*STEP;
       } else {
+        #if DEBUG
         Serial.println("No walls in sight \n");
+        #endif
         motor_speed_l = FORWARD_FULL;
         motor_speed_r = FORWARD_FULL;
       }
       
     } else if (ir_averages.left < LEFT_LIMIT) { // Wall to left
+      #if DEBUG
       Serial.println("Object to the left \n");
+      #endif
       // Turn right a little bit
       motor_speed_l = FORWARD_FULL;
       motor_speed_r = FORWARD_FULL - 10*STEP;
       
     } else if (ir_averages.right < RIGHT_LIMIT) {
+      #if DEBUG
       Serial.println("Object to the right \n");
+      #endif
       // Turn left a little bit
       motor_speed_l = FORWARD_FULL - 10*STEP;
       motor_speed_r = FORWARD_FULL;
+    } else {
+      #if DEBUG
+      Serial.println("WTFFFFFFFFFF \n");
+      #endif
+      // Turn left a little bit
+      motor_speed_l = FORWARD_SLOW;
+      motor_speed_r = FORWARD_SLOW;
+      
     }
   }
 }
-
-
-void victory_dance(void) {
-  Serial.println("Victory dance ");
-  
-}
-
 
 int PID_control(int value, int desired, float Kp, float Ki, float Kd, int current_speed) {
   // Scales the values up by a constant so integers can be used. This removes rounding errors.
