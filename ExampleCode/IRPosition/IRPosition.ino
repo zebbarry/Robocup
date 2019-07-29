@@ -4,8 +4,8 @@
  
 #include <Wire.h>
  
-int IRsensorAddress = 0xB0;
-//int IRsensorAddress = 0x58;
+//int IRsensorAddress = 0xB0;
+int IRsensorAddress = 0x58;
 
 int slaveAddress;
 int ledPin = 13;
@@ -30,7 +30,7 @@ void setup()
   digitalWrite(49, 1);                 //Enable IO power on main CPU board
   
     slaveAddress = IRsensorAddress >> 1;   // This results in 0x21 as the address to pass to TWI
-    Serial.begin(19200);
+    Serial.begin(9600);
     pinMode(ledPin, OUTPUT);      // Set the LED pin as output
     Wire.begin();
     // IR sensor initialize

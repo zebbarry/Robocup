@@ -81,10 +81,3 @@ void printResult()
   }
   Serial.println();
 }
-
-
-
-
-
-
-
