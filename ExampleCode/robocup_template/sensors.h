@@ -10,7 +10,8 @@
 
 #define IR_SHORT_LEFT_PIN   A0
 #define IR_SHORT_RIGHT_PIN  A1
-#define IR_SHORT_FRONT_PIN  A2
+#define IR_SHORT_FRLT_PIN   A2
+#define IR_SHORT_FRRT_PIN   A3
 #define IR_BUF_SIZE         10
 
 #define INDUCTIVE_PIN       45
@@ -18,19 +19,21 @@
 #define LIMIT_PIN 36
 
 
-enum dir {LEFT = 0, RIGHT, FRONT, NUM_IR_SENS};
+enum dir {LEFT = 0, RIGHT, FRLT, FRRT, NUM_IR_SENS};
 enum ir_type {SHORT = 0, MEDIUM, LONG};
 
 typedef  struct {
   CircularBuffer<int, IR_BUF_SIZE> left;
   CircularBuffer<int, IR_BUF_SIZE> right;
-  CircularBuffer<int, IR_BUF_SIZE> front;
+  CircularBuffer<int, IR_BUF_SIZE> frlt;
+  CircularBuffer<int, IR_BUF_SIZE> frrt;
 } ir_array_t;
 
 typedef  struct {
   int left;
   int right;
-  int front;
+  int frlt;
+  int frrt;
 } ir_averages_t;
 
 extern ir_averages_t ir_averages;

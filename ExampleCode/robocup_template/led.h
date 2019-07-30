@@ -1,58 +1,24 @@
 //************************************
-//         sensors.h     
+//         led.h     
 //************************************
 
-#ifndef SENSORS_H_
-#define SENSORS_H_
+#ifndef LED_H_
+#define LED_H_
 
 #include <stdint.h>
-#include <CircularBuffer.h>
 
-#define IR_SHORT_LEFT_PIN   A0
-#define IR_SHORT_RIGHT_PIN  A1
-#define IR_SHORT_FRONT_PIN  A2
-#define IR_BUF_SIZE         10
+#define RED   42
+#define GREEN 44
+#define BLUE  43
 
-#define INDUCTIVE_PIN       45
-#define US_TRIG_PIN         10
-#define LIMIT_PIN 36
+void led_init(void);
 
+void led_on(int led_pin);
 
-enum dir {LEFT = 0, RIGHT, FRONT, NUM_IR_SENS};
-enum ir_type {SHORT = 0, MEDIUM, LONG};
+void led_off(int led_pin);
 
-typedef  struct {
-  CircularBuffer<int, IR_BUF_SIZE> left;
-  CircularBuffer<int, IR_BUF_SIZE> right;
-  CircularBuffer<int, IR_BUF_SIZE> front;
-} ir_array_t;
+bool led_toggle(int led_pin);
 
-typedef  struct {
-  int left;
-  int right;
-  int front;
-} ir_averages_t;
+void led_write(int red_pin, int green_pin, int blue_pin);
 
-extern ir_averages_t ir_averages;
-
-extern bool collection_complete;
-extern bool collection_mode;
-extern bool state_change;
-
-void sensor_init(void);
-
-int average_buf(CircularBuffer<int, IR_BUF_SIZE>* buf);
-
-// Convert analog value to mm
-int convert_ir_dist(int analog, enum ir_type type);
-
-// Read ultrasonic value
-void send_ultrasonic(void);
-
-// Read infrared value
-void read_infrared(void);
-
-// Pass in data and average the lot
-void sensor_average(void);
-
-#endif /* SENSORS_H_ */
+#endif /* LED_H_ */

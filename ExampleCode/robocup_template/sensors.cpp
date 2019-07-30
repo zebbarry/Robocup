@@ -21,7 +21,8 @@ void sensor_init(void) {
   #endif
   pinMode(IR_SHORT_LEFT_PIN, INPUT);
   pinMode(IR_SHORT_RIGHT_PIN, INPUT);
-  pinMode(IR_SHORT_FRONT_PIN, INPUT);
+  pinMode(IR_SHORT_FRLT_PIN, INPUT);
+  pinMode(IR_SHORT_FRRT_PIN, INPUT);
   pinMode(INDUCTIVE_PIN, INPUT_PULLUP);
   pinMode(US_TRIG_PIN, OUTPUT);
 }
@@ -82,30 +83,38 @@ void read_infrared(void){
   sensorVal = analogRead(IR_SHORT_RIGHT_PIN);
   ir_array.right.push(sensorVal);
   
-  sensorVal = analogRead(IR_SHORT_FRONT_PIN);
-  ir_array.front.push(sensorVal);
+  sensorVal = analogRead(IR_SHORT_FRLT_PIN);
+  ir_array.frlt.push(sensorVal);
+  
+  sensorVal = analogRead(IR_SHORT_FRRT_PIN);
+  ir_array.frrt.push(sensorVal);
 }
 
 
 // Pass in data and average the lot
 void sensor_average(void){
   
-  int actual = average_buf(&ir_array.left);
-  ir_averages.left = convert_ir_dist(actual, SHORT);
+  int average = average_buf(&ir_array.left);
+  ir_averages.left = convert_ir_dist(average, SHORT);
   
-  actual = average_buf(&ir_array.right);
-  ir_averages.right = convert_ir_dist(actual, SHORT);
+  average = average_buf(&ir_array.right);
+  ir_averages.right = convert_ir_dist(average, SHORT);
   
-  actual = average_buf(&ir_array.front);
-  ir_averages.front = convert_ir_dist(actual, SHORT);
+  average = average_buf(&ir_array.frlt);
+  ir_averages.frlt = convert_ir_dist(average, SHORT);
+  
+  average = average_buf(&ir_array.frrt);
+  ir_averages.frrt = convert_ir_dist(average, SHORT);
   
   #if DEBUG
-  Serial.print("Averaging the sensors (L, R, F) ");
+  Serial.print("Averaging the sensors (L, FL, FR, R) ");
   Serial.print(ir_averages.left);
   Serial.print(" ");
-  Serial.print(ir_averages.right);
+  Serial.print(ir_averages.frlt);
   Serial.print(" ");
-  Serial.println(ir_averages.front);
+  Serial.print(ir_averages.frrt);
+  Serial.print(" ");
+  Serial.println(ir_averages.right);
   #endif
   
    static int limit_1, limit_2, limit_3;

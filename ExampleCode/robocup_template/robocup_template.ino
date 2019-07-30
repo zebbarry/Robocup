@@ -25,6 +25,7 @@
 #include "start_robot.h"
 #include "debug.h"
 #include "stepper.h"
+#include "led.h"
 
 //**********************************************************************************
 // Local Definitions
@@ -33,7 +34,7 @@
 // Task period Definitions
 // ALL OF THESE VALUES WILL NEED TO BE SET TO SOMETHING USEFUL !!!!!!!!!!!!!!!!!!!!
 #define US_SEND_TASK_PERIOD                 500
-#define IR_READ_TASK_PERIOD                 20   //
+#define IR_READ_TASK_PERIOD                 15   //
 #define SENSOR_AVERAGE_PERIOD               150   //
 #define SET_MOTOR_TASK_PERIOD               150   //
 #define START_ROBOT_TASK_PERIOD             150   //
@@ -149,8 +150,8 @@ void robot_init() {
     Serial.println("Robot is ready \n");
     #endif
     
-    motor_speed_l = MAX_SPEED;
-    motor_speed_r = MAX_SPEED;
+    motor_speed_l = STOP_SPEED;
+    motor_speed_r = STOP_SPEED;
     collection_complete = false;
     collection_mode = true;
     state_change = true;
@@ -213,12 +214,14 @@ void loop() {
     tWeight_scan.enable();
     tCollect_weight.enable();
     state_change = false;
+    led_off(BLUE);
   } else if (state_change) {
     tSet_motor.enable();
     tStart_robot.enable();
     tWeight_scan.disable();
     tCollect_weight.disable();
     state_change = false;
+    led_off(GREEN);
   }
   
   taskManager.execute();    //execute the scheduler

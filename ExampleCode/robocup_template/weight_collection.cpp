@@ -11,6 +11,7 @@
 #include "Arduino.h"
 #include "stepper.h"
 #include "debug.h"
+#include "led.h"
 
 enum weight_s weight_state;
 
@@ -22,15 +23,17 @@ void weight_scan(void)
    Serial.println("Looking for weights \n");
    #endif
 
+   led_toggle(GREEN);
+
    int induct_state = digitalRead(INDUCTIVE_PIN);
-   if (induct_state) {
-    #if DEBUG
-    Serial.println("Inductive Active \n");
-    #endif
-    weight_state = WEIGHT_FOUND;
-   } else if (WEIGHT_FOUND) {
-    weight_state = NO_WEIGHT;
-   }
+//   if (induct_state) {
+//    #if DEBUG
+//    Serial.println("Inductive Active \n");
+//    #endif
+//    weight_state = WEIGHT_FOUND;
+//   } else if (WEIGHT_FOUND) {
+//    weight_state = NO_WEIGHT;
+//   }
 }
 
 
