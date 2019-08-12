@@ -23,7 +23,7 @@
 #include "sensors.h"
 #include "weight_collection.h" 
 #include "start_robot.h"
-#include "debug.h"
+#include "pin_map.h"
 #include "stepper.h"
 #include "led.h"
 

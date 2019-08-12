@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "motors.h"
 #include "Arduino.h"
-#include "debug.h"
+#include "pin_map.h"
 
 void motor_init(Servo motor, int pin) {
   motor.attach(pin);

@@ -11,7 +11,7 @@
 #include "sensors.h"
 #include "Arduino.h"
 #include "debug.h"
-#include "led.h"
+#include "pin_map.h"
 
 // Local definitions
 int32_t error_int, error_prev;
@@ -28,7 +28,7 @@ void start_robot(void){
     #if DEBUG
     Serial.println("Object in front");
     #endif
-    if (ir_averages.left < LEFT_LIMIT && ir_averages.right < RIGHT_LIMIT) { // Cornered
+    if (ir_averages.left < LEFT_LIMIT && ir_averages.right < RIGHT_LIMIT) { // Object in front and left and right
       #if DEBUG
       Serial.println("Cornered \n");
       #endif
@@ -36,9 +36,9 @@ void start_robot(void){
       motor_speed_l = BACK_SLOW;
       motor_speed_r = BACK_SLOW;
       
-    } else if (ir_averages.left < ir_averages.right) {   // Object also to the left
+    } else if (ir_averages.left < ir_averages.right) {   // Object in front and closer to the left
       #if DEBUG
-      Serial.println("Object also to the left \n");
+      Serial.println("Object also closer to the left");
       #endif
       // Turn right
       motor_speed_l = FORWARD_SLOW;
@@ -46,7 +46,7 @@ void start_robot(void){
       
     } else {  // Object to right
       #if DEBUG
-      Serial.println("Object also to the right \n");
+      Serial.println("Object also closer to the right \n");
       #endif
       // Turn left
       motor_speed_l = BACK_SLOW;
@@ -58,6 +58,7 @@ void start_robot(void){
       #if DEBUG
       Serial.println("No walls too close");
       #endif
+      
       if (ir_averages.left < ir_averages.right) { // Closer to the left
         #if DEBUG
         Serial.println("Closer to the left \n");

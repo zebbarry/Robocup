@@ -10,7 +10,7 @@
 #include "sensors.h"
 #include "Arduino.h"
 #include "stepper.h"
-#include "debug.h"
+#include "pin_map.h"
 #include "led.h"
 
 enum weight_s weight_state;

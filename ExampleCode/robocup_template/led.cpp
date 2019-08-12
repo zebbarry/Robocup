@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 #include "Arduino.h"
-#include "debug.h"
+#include "pin_map.h"
 #include "led.h"
 
 

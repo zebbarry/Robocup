@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "stepper.h"
 #include "Arduino.h"
-#include "debug.h"
+#include "pin_map.h"
 
 void stepper_init(int dir_pin, int step_pin) {
   #if DEBUG

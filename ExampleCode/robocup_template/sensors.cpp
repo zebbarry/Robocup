@@ -10,7 +10,7 @@
 #include "sensors.h"
 #include "Arduino.h"
 #include <CircularBuffer.h>
-#include "debug.h"
+#include "pin_map.h"
 
 // Local definitions
 ir_array_t ir_array;
