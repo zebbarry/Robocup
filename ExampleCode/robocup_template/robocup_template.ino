@@ -138,7 +138,8 @@ void pin_init(){
     // Initialise left and right drive motor pins
     motor_init(right_motor, RIGHT_MOTOR_PIN);
     motor_init(left_motor, LEFT_MOTOR_PIN);
-    stepper_init(DIR_PIN, STEP_PIN);
+    stepper_init(VER_DIR_PIN, VER_STEP_PIN);
+    stepper_init(HOR_DIR_PIN, HOR_STEP_PIN);
 
     pinMode(MAG_PIN, OUTPUT);
     digitalWrite(MAG_PIN, LOW);
@@ -146,8 +147,8 @@ void pin_init(){
     digitalWrite(FAN_PIN, LOW);
     pinMode(LIMIT_PIN, INPUT);
     sensor_init();
-    tof_init();
-    imu_init();
+//    tof_init();
+//    imu_init();
     
     #if DEBUG
     Serial.println("Pins have been initialised \n"); 
@@ -216,11 +217,11 @@ void task_init() {
 // put your main code here, to run repeatedly
 //**********************************************************************************
 void loop() {
-  if (collection_complete) {
-    tVictory_dance.enable();
-  } else {
-    tVictory_dance.disable();
-  }
+//  if (collection_complete) {
+//    tVictory_dance.enable();
+//  } else {
+//    tVictory_dance.disable();
+//  }
 
   if (collection_mode && state_change) {
     left_motor.writeMicroseconds(STOP_SPEED);

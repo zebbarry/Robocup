@@ -7,10 +7,6 @@
 
 #include <stdint.h>
 
-#define RED   42
-#define GREEN 44
-#define BLUE  43
-
 void led_init(void);
 
 void led_on(int led_pin);

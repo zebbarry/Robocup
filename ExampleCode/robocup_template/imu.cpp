@@ -52,8 +52,8 @@ BNO::eStatus_t imu_init(void) {
 }
 
 
-sAxisAnalog_t read_imu_axis(enum axis_t axis) {
-  sAxisAnalog_t result;
+sAxis_t read_imu_axis(enum axis_t axis) {
+  sAxis_t result;
 
   switch (axis) {
     case ACC: result = bno.getAxis(BNO::eAxisAcc); break;
@@ -66,16 +66,19 @@ sAxisAnalog_t read_imu_axis(enum axis_t axis) {
 }
 
 
-
-sEulAnalog_t read_imu_eul(void) {
+sEul_t read_imu_eul(void) {
   return bno.getEul();
 }
 
 
+sQua_t read_imu_qua(void) {
+  return bno.getQua();
+}
+
 
 float read_imu_eul_dir(enum moment_t moment) {
   float result;
-  sEulAnalog_t sEulAnalog = bno.getEul();
+  sEul_t sEulAnalog = bno.getEul();
 
   switch (moment) {
     case HEAD: result = sEulAnalog.head; break;
@@ -83,10 +86,4 @@ float read_imu_eul_dir(enum moment_t moment) {
     case PITCH: result = sEulAnalog.pitch; break;
   }
   return result;
-}
-
-
-
-sQuaAnalog_t read_imu_qua(void) {
-  return bno.getQua();
 }

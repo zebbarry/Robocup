@@ -16,6 +16,8 @@
 #include "imu.h"
 
 // Local definitions
+enum ir_dir {LEFT = 0, RIGHT, FRLT, FRRT, NUM_IR_SENS};
+
 ir_array_t ir_array;
 DFRobotVL53L0X tof_sensor;
 

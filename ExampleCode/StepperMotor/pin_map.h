@@ -89,24 +89,17 @@
 #define IR_SHORT_FRLT_PIN   A2
 #define IR_SHORT_FRRT_PIN   A3
 
-// Miscellaneous Pins
-#define INDUCTIVE_PIN       DI1
-#define RED                 DI4
-#define GREEN               DI2
-#define BLUE                DI3
-#define US_TRIG_PIN         DI8 // Wrong
-#define LIMIT_PIN           DI6
-#define MAG_PIN             DI5
-#define FAN_PIN             DI7 // Wrong
+// Miscellaneous Sensor Pins
+#define INDUCTIVE_PIN       45
+#define US_TRIG_PIN         10
+#define LIMIT_PIN           36
+#define MAG_PIN             33
+#define FAN_PIN             32
 
 // Stepper Pins
 #define HOR_DIR_PIN         DO8
 #define HOR_STEP_PIN        DO7
 #define VER_DIR_PIN         DO6
 #define VER_STEP_PIN        DO5
-
-// Drive Motor Pins
-#define LEFT_MOTOR_PIN      S6_1          //Pin corresponding to the left dc motor
-#define RIGHT_MOTOR_PIN     S6_2         //Pin corresponding to the right dc motor
 
 #endif /* PIN_MAP_H_ */

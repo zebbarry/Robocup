@@ -8,18 +8,8 @@
 #include <stdint.h>
 #include <CircularBuffer.h>
 
-#define IR_SHORT_LEFT_PIN   A0
-#define IR_SHORT_RIGHT_PIN  A1
-#define IR_SHORT_FRLT_PIN   A2
-#define IR_SHORT_FRRT_PIN   A3
 #define IR_BUF_SIZE         10
 
-#define INDUCTIVE_PIN       45
-#define US_TRIG_PIN         10
-#define LIMIT_PIN 36
-
-
-enum dir {LEFT = 0, RIGHT, FRLT, FRRT, NUM_IR_SENS};
 enum ir_type {SHORT = 0, MEDIUM, LONG};
 
 typedef  struct {
