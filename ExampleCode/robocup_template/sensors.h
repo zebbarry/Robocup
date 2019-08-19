@@ -37,12 +37,20 @@ typedef  struct {
 } ir_averages_t;
 
 extern ir_averages_t ir_averages;
+extern int tof_reading;
+extern float imu_reading;
 
 extern bool collection_complete;
 extern bool collection_mode;
 extern bool state_change;
 
 void sensor_init(void);
+
+void tof_init(void);
+
+void read_tof(void);
+
+void read_imu(void);
 
 int average_buf(CircularBuffer<int, IR_BUF_SIZE>* buf);
 

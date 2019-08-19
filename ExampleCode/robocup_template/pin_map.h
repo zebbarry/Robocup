@@ -79,4 +79,8 @@
 #define C3_3  14  // TX3
 #define C3_4  15  // RX3
 
+// I2C ID numbers
+#define TOF_ID  0x50
+#define IMU_ID  0x28
+#define CAM_ID  
 #endif /* PIN_MAP_H_ */

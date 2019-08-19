@@ -10,10 +10,14 @@
 #include "sensors.h"
 #include "Arduino.h"
 #include <CircularBuffer.h>
+#include "Wire.h"
+#include "DFRobot_VL53L0X.h"
 #include "pin_map.h"
+#include "imu.h"
 
 // Local definitions
 ir_array_t ir_array;
+DFRobotVL53L0X tof_sensor;
 
 void sensor_init(void) {
   #if DEBUG
@@ -26,6 +30,36 @@ void sensor_init(void) {
   pinMode(INDUCTIVE_PIN, INPUT_PULLUP);
   pinMode(US_TRIG_PIN, OUTPUT);
 }
+
+
+void tof_init(void) {
+  #if DEBUG
+  Serial.println("Initialise TOF camera");
+  #endif
+
+  tof_sensor.begin(TOF_ID);
+  tof_sensor.setMode(Continuous, High);
+  tof_sensor.start();
+}
+
+
+void read_tof(void) {
+  #if DEBUG
+  Serial.println("Reading TOF camera \n");
+  #endif
+
+  tof_reading = tof_sensor.getDistance();
+}
+
+
+void read_imu(void) {
+  #if DEBUG
+  Serial.println("Reading IMU sensor \n");
+  #endif
+
+  imu_reading = read_imu_eul_dir(PITCH);
+}
+
 
 
 int average_buf(CircularBuffer<int, IR_BUF_SIZE>* buf) {

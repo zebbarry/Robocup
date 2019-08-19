@@ -26,6 +26,7 @@
 #include "pin_map.h"
 #include "stepper.h"
 #include "led.h"
+#include "imu.h"
 
 //**********************************************************************************
 // Local Definitions
@@ -34,10 +35,12 @@
 // Task period Definitions
 // ALL OF THESE VALUES WILL NEED TO BE SET TO SOMETHING USEFUL !!!!!!!!!!!!!!!!!!!!
 #define US_SEND_TASK_PERIOD                 500
-#define IR_READ_TASK_PERIOD                 15   //
-#define SENSOR_AVERAGE_PERIOD               150   //
-#define SET_MOTOR_TASK_PERIOD               150   //
-#define START_ROBOT_TASK_PERIOD             150   //
+#define IR_READ_TASK_PERIOD                 15
+#define TOF_READ_TASK_PERIOD                100
+#define IMU_READ_TASK_PERIOD                100
+#define SENSOR_AVERAGE_PERIOD               150
+#define SET_MOTOR_TASK_PERIOD               150
+#define START_ROBOT_TASK_PERIOD             150
 #define WEIGHT_SCAN_TASK_PERIOD             200
 #define COLLECT_WEIGHT_TASK_PERIOD          200
 #define CHECK_WATCHDOG_TASK_PERIOD          40
@@ -47,6 +50,8 @@
 // -1 means indefinitely
 #define US_SEND_TASK_NUM_EXECUTE           -1
 #define IR_READ_TASK_NUM_EXECUTE           -1
+#define TOF_READ_TASK_NUM_EXECUTE          -1
+#define IMU_READ_TASK_NUM_EXECUTE          -1
 #define SENSOR_AVERAGE_NUM_EXECUTE         -1
 #define SET_MOTOR_TASK_NUM_EXECUTE         -1
 #define START_ROBOT_TASK_NUM_EXECUTE       -1
@@ -61,12 +66,15 @@
 // Serial definitions
 #define BAUD_RATE 9600
 
+// External definitons
 Servo right_motor;
 Servo left_motor;
 ir_averages_t ir_averages;
 int motor_speed_l;
 int motor_speed_r;
 int current_pos;
+int tof_reading;
+float imu_reading;
 bool collection_complete;
 bool collection_mode;
 bool state_change;
@@ -81,6 +89,8 @@ bool state_change;
 // Tasks for reading sensors 
 Task tSend_ultrasonic(US_SEND_TASK_PERIOD,       US_SEND_TASK_NUM_EXECUTE,        &send_ultrasonic);
 Task tRead_infrared(IR_READ_TASK_PERIOD,         IR_READ_TASK_NUM_EXECUTE,        &read_infrared);
+Task tRead_tof(TOF_READ_TASK_PERIOD,             TOF_READ_TASK_NUM_EXECUTE,       &read_tof);
+Task tRead_imu(IMU_READ_TASK_PERIOD,             IMU_READ_TASK_NUM_EXECUTE,       &read_imu);
 Task tSensor_average(SENSOR_AVERAGE_PERIOD,      SENSOR_AVERAGE_NUM_EXECUTE,      &sensor_average);
 
 // Task to set the motor speeds and direction
@@ -136,6 +146,8 @@ void pin_init(){
     digitalWrite(FAN_PIN, LOW);
     pinMode(LIMIT_PIN, INPUT);
     sensor_init();
+    tof_init();
+    imu_init();
     
     #if DEBUG
     Serial.println("Pins have been initialised \n"); 
@@ -168,6 +180,8 @@ void task_init() {
   // Add tasks to the scheduler
   taskManager.addTask(tSend_ultrasonic);   //reading ultrasonic 
   taskManager.addTask(tRead_infrared);
+  taskManager.addTask(tRead_tof);
+  taskManager.addTask(tRead_imu);
   taskManager.addTask(tSensor_average);
   taskManager.addTask(tSet_motor);
   taskManager.addTask(tStart_robot);
@@ -180,6 +194,8 @@ void task_init() {
   // Enable the tasks
   tSend_ultrasonic.enable();
   tRead_infrared.enable();
+//  tRead_tof.enable();
+//  tRead_imu.enable();
   tSensor_average.enable();
 //  tSet_motor.enable();
 //  tStart_robot.enable();

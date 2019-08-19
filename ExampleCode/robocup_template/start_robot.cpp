@@ -10,8 +10,8 @@
 #include "motors.h"
 #include "sensors.h"
 #include "Arduino.h"
-#include "debug.h"
 #include "pin_map.h"
+#include "led.h"
 
 // Local definitions
 int32_t error_int, error_prev;
