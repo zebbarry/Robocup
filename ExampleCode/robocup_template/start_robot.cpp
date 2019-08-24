@@ -24,7 +24,7 @@ void start_robot(void){
 
   led_toggle(BLUE);
 
-  if (ir_averages.frlt < FRONT_LIMIT || ir_averages.frrt < FRONT_LIMIT) {    // Object in front
+  if (ir_averages.front < FRONT_LIMIT) {    // Object in front
     #if DEBUG
     Serial.println("Object in front");
     #endif

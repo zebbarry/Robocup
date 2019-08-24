@@ -15,15 +15,13 @@ enum ir_type {SHORT = 0, MEDIUM, LONG};
 typedef  struct {
   CircularBuffer<int, IR_BUF_SIZE> left;
   CircularBuffer<int, IR_BUF_SIZE> right;
-  CircularBuffer<int, IR_BUF_SIZE> frlt;
-  CircularBuffer<int, IR_BUF_SIZE> frrt;
+  CircularBuffer<int, IR_BUF_SIZE> front;
 } ir_array_t;
 
 typedef  struct {
   int left;
   int right;
-  int frlt;
-  int frrt;
+  int front;
 } ir_averages_t;
 
 extern ir_averages_t ir_averages;

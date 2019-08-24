@@ -16,7 +16,7 @@
 
 #include "sensors.h"               //will need sensor library to detect weights
 
-#define VER_STEPS     3000
+#define VER_STEPS     3500
 #define HOR_STEPS     1000
 
 //states for swapping between searching and collecting

@@ -6,7 +6,7 @@
 #define PIN_MAP_H_
 
 // Debug mode -- 1 if compile serial outputs
-#define DEBUG 1
+#define DEBUG 0
 
 // Arduino ports
 // Analog
@@ -84,17 +84,16 @@
 #define IMU_ID  0x28
 
 // IR Sensor Pins
-#define IR_SHORT_LEFT_PIN   A0
-#define IR_SHORT_RIGHT_PIN  A1
-#define IR_SHORT_FRLT_PIN   A2
-#define IR_SHORT_FRRT_PIN   A3
+#define IR_SHORT_LEFT_PIN   A1
+#define IR_SHORT_RIGHT_PIN  A0
+#define IR_SHORT_FRONT_PIN  A2
 
 // Miscellaneous Pins
 #define INDUCTIVE_PIN       DI1
 #define RED                 DI4
 #define GREEN               DI2
 #define BLUE                DI3
-#define US_TRIG_PIN         DI8 // Wrong
+#define US_TRIG_PIN         A4 // Wrong
 #define LIMIT_PIN           DI6
 #define MAG_PIN             DI5
 #define FAN_PIN             DI7 // Wrong
@@ -106,7 +105,7 @@
 #define VER_STEP_PIN        DO5
 
 // Drive Motor Pins
-#define LEFT_MOTOR_PIN      S6_1          //Pin corresponding to the left dc motor
-#define RIGHT_MOTOR_PIN     S6_2         //Pin corresponding to the right dc motor
+#define LEFT_MOTOR_PIN      S6_2          //Pin corresponding to the left dc motor
+#define RIGHT_MOTOR_PIN     S6_1         //Pin corresponding to the right dc motor
 
 #endif /* PIN_MAP_H_ */

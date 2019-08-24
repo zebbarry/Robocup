@@ -63,9 +63,9 @@ void collect_weight(void)
         weight_state = NO_WEIGHT;
       } else {
         drive_step(HOR_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, RIGHT);
-        drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
+//        drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
         digitalWrite(MAG_PIN, LOW);
-        drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, UP);
+//        drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, UP);
         drive_step(HOR_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, LEFT);
         drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
 //        collection_complete = true;
