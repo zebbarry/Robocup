@@ -1,8 +1,8 @@
 /*
 Test out the low cost ultrasound sensor
 */
-const int trigPin = A0;
-const int echoPin = A1;
+const int trigPin = 12;
+const int echoPin = 11;
  
 void setup() 
 {

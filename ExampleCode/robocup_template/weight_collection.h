@@ -16,9 +16,8 @@
 
 #include "sensors.h"               //will need sensor library to detect weights
 
-#define MAG_PIN   33
-#define FAN_PIN   32
-#define STEPS     2000
+#define VER_STEPS     3500
+#define HOR_STEPS     1000
 
 //states for swapping between searching and collecting
 enum weight_s {NO_WEIGHT = 0, WEIGHT_FOUND};

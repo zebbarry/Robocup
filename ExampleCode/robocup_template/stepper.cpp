@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "stepper.h"
 #include "Arduino.h"
-#include "debug.h"
+#include "pin_map.h"
 
 void stepper_init(int dir_pin, int step_pin) {
   #if DEBUG
@@ -17,7 +17,12 @@ void stepper_init(int dir_pin, int step_pin) {
 
 
 
-void drive_step(int steps, int step_pin) {
+void drive_step(int steps, int step_pin, int dir_pin, int dir) {
+  if (dir) {
+    digitalWrite(dir_pin, HIGH);
+  } else {
+    digitalWrite(dir_pin, LOW);  // down
+  }
   int i = 0;
   for (i = 0; i < steps; i++) {
     digitalWrite(step_pin,LOW);

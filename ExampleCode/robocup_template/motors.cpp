@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "motors.h"
 #include "Arduino.h"
-#include "debug.h"
+#include "pin_map.h"
 
 void motor_init(Servo motor, int pin) {
   motor.attach(pin);
@@ -58,7 +58,6 @@ void set_motor(void) {
   right_motor.writeMicroseconds(motor_speed_r);
 
   #if DEBUG
-  Serial.println("Check the motor speed limit");
   Serial.print("Change the motor speed to (L, R) (");
   Serial.print(motor_speed_l);
   Serial.print(", ");

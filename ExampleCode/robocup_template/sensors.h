@@ -8,17 +8,8 @@
 #include <stdint.h>
 #include <CircularBuffer.h>
 
-#define IR_SHORT_LEFT_PIN   A0
-#define IR_SHORT_RIGHT_PIN  A1
-#define IR_SHORT_FRONT_PIN  A2
-#define IR_BUF_SIZE         20
+#define IR_BUF_SIZE         10
 
-#define INDUCTIVE_PIN       42
-#define US_TRIG_PIN         10
-#define LIMIT_PIN 36
-
-
-enum dir {LEFT = 0, RIGHT, FRONT, NUM_IR_SENS};
 enum ir_type {SHORT = 0, MEDIUM, LONG};
 
 typedef  struct {
@@ -34,12 +25,20 @@ typedef  struct {
 } ir_averages_t;
 
 extern ir_averages_t ir_averages;
+extern int tof_reading;
+extern float imu_reading;
 
 extern bool collection_complete;
 extern bool collection_mode;
 extern bool state_change;
 
 void sensor_init(void);
+
+void tof_init(void);
+
+void read_tof(void);
+
+void read_imu(void);
 
 int average_buf(CircularBuffer<int, IR_BUF_SIZE>* buf);
 

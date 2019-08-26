@@ -10,7 +10,8 @@
 #include "sensors.h"
 #include "Arduino.h"
 #include "stepper.h"
-#include "debug.h"
+#include "pin_map.h"
+#include "led.h"
 
 enum weight_s weight_state;
 
@@ -21,6 +22,8 @@ void weight_scan(void)
    #if DEBUG
    Serial.println("Looking for weights \n");
    #endif
+
+   led_toggle(GREEN);
 
    int induct_state = digitalRead(INDUCTIVE_PIN);
    if (induct_state) {
@@ -47,18 +50,25 @@ void collect_weight(void)
       #endif
       digitalWrite(MAG_PIN, HIGH);
       delay(500);
-      drive_step(STEPS, STEP_PIN);
+      drive_step(100, VER_STEP_PIN, VER_DIR_PIN, DOWN);
+      drive_step(100, VER_STEP_PIN, VER_DIR_PIN, UP);
+      drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, UP);
       induct_state = digitalRead(INDUCTIVE_PIN);
+      
       if (!induct_state) {
         #if DEBUG
         Serial.println("Inductive not active \n");
         #endif
-        digitalWrite(DIR_PIN, HIGH);
-        drive_step(STEPS, STEP_PIN);
-        digitalWrite(DIR_PIN, LOW);
+        drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
         weight_state = NO_WEIGHT;
       } else {
-        collection_complete = true;
+        drive_step(HOR_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, RIGHT);
+//        drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
+        digitalWrite(MAG_PIN, LOW);
+//        drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, UP);
+        drive_step(HOR_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, LEFT);
+        drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
+//        collection_complete = true;
       }
     }
     break;
@@ -76,11 +86,9 @@ void victory_dance(void) {
   #endif
   digitalWrite(FAN_PIN, HIGH);
   delay(5000);
-  digitalWrite(DIR_PIN, HIGH);
-  drive_step(STEPS, STEP_PIN);
-  digitalWrite(DIR_PIN, LOW);
+//  drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
   digitalWrite(MAG_PIN, LOW);
   digitalWrite(FAN_PIN, LOW);
-  delay(100);
+  delay(1000);
   collection_complete = false;
 }

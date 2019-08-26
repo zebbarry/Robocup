@@ -10,10 +10,16 @@
 #include "sensors.h"
 #include "Arduino.h"
 #include <CircularBuffer.h>
-#include "debug.h"
+#include "Wire.h"
+#include "DFRobot_VL53L0X.h"
+#include "pin_map.h"
+#include "imu.h"
 
 // Local definitions
+enum ir_dir {LEFT = 0, RIGHT, FRLT, FRRT, NUM_IR_SENS};
+
 ir_array_t ir_array;
+DFRobotVL53L0X tof_sensor;
 
 void sensor_init(void) {
   #if DEBUG
@@ -25,6 +31,36 @@ void sensor_init(void) {
   pinMode(INDUCTIVE_PIN, INPUT_PULLUP);
   pinMode(US_TRIG_PIN, OUTPUT);
 }
+
+
+void tof_init(void) {
+  #if DEBUG
+  Serial.println("Initialise TOF camera");
+  #endif
+
+  tof_sensor.begin(TOF_ID);
+  tof_sensor.setMode(Continuous, High);
+  tof_sensor.start();
+}
+
+
+void read_tof(void) {
+  #if DEBUG
+  Serial.println("Reading TOF camera \n");
+  #endif
+
+  tof_reading = tof_sensor.getDistance();
+}
+
+
+void read_imu(void) {
+  #if DEBUG
+  Serial.println("Reading IMU sensor \n");
+  #endif
+
+  imu_reading = read_imu_eul_dir(PITCH);
+}
+
 
 
 int average_buf(CircularBuffer<int, IR_BUF_SIZE>* buf) {
@@ -90,22 +126,22 @@ void read_infrared(void){
 // Pass in data and average the lot
 void sensor_average(void){
   
-  int actual = average_buf(&ir_array.left);
-  ir_averages.left = convert_ir_dist(actual, SHORT);
+  int average = average_buf(&ir_array.left);
+  ir_averages.left = convert_ir_dist(average, SHORT);
   
-  actual = average_buf(&ir_array.right);
-  ir_averages.right = convert_ir_dist(actual, SHORT);
+  average = average_buf(&ir_array.right);
+  ir_averages.right = convert_ir_dist(average, SHORT);
   
-  actual = average_buf(&ir_array.front);
-  ir_averages.front = convert_ir_dist(actual, SHORT);
+  average = average_buf(&ir_array.front);
+  ir_averages.front = convert_ir_dist(average, SHORT);
   
   #if DEBUG
-  Serial.print("Averaging the sensors (L, R, F) ");
+  Serial.print("Averaging the sensors (L, F, R) ");
   Serial.print(ir_averages.left);
   Serial.print(" ");
-  Serial.print(ir_averages.right);
+  Serial.print(ir_averages.front);
   Serial.print(" ");
-  Serial.println(ir_averages.front);
+  Serial.println(ir_averages.right);
   #endif
   
    static int limit_1, limit_2, limit_3;
