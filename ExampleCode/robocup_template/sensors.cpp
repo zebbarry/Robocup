@@ -16,7 +16,10 @@
 #include "imu.h"
 
 // Local definitions
-enum ir_dir {LEFT = 0, RIGHT, FRLT, FRRT, NUM_IR_SENS};
+#define MIN_SHORT_ANALOG  30
+#define MIN_MEDIUM_ANALOG 50
+
+enum ir_dir {LEFT = 0, RIGHT, FRONT, NUM_IR_SENS};
 
 ir_array_t ir_array;
 DFRobotVL53L0X tof_sensor;
@@ -53,6 +56,7 @@ void read_tof(void) {
 }
 
 
+
 void read_imu(void) {
   #if DEBUG
   Serial.println("Reading IMU sensor \n");
@@ -72,26 +76,40 @@ int average_buf(CircularBuffer<int, IR_BUF_SIZE>* buf) {
 }
 
 
+
+int convert_ir_dist_short(int analog)  {
+  return 18684*pow(analog, -0.952);  // Derived from excel using experimental data.
+}
+
+
+
+int convert_ir_dist_medium(int analog)  {
+  return 213184*pow(analog, -1.125);  // Derived from excel using experimental data.
+}
+
+
+
 // Convert analog value to mm
 int convert_ir_dist(int analog, enum ir_type type) {
   int dist_mm;
   switch(type) {
     case SHORT:
-    dist_mm = 18684*pow(analog, -0.952);  // Derived from excel using experimental data.
-    if (analog < 35) {
-      dist_mm = 633;
+    dist_mm = convert_ir_dist_short(analog);  // Derived from excel using experimental data.
+    if (analog < MIN_SHORT_ANALOG) {
+      dist_mm = convert_ir_dist_short(MIN_SHORT_ANALOG);
     }
     break;
     
     case MEDIUM:
-    dist_mm = 213184*pow(analog, -1.125);  // Derived from excel using experimental data.
-    if (analog < 50) {
-      dist_mm = 2614;
+    dist_mm = convert_ir_dist_medium(analog);  // Derived from excel using experimental data.
+    if (analog < MIN_MEDIUM_ANALOG) {
+      dist_mm = convert_ir_dist_medium(MIN_MEDIUM_ANALOG);
     }
     break;
   }
   return dist_mm;
 }
+
 
 
 // Send ultrasonic value
@@ -109,6 +127,7 @@ void send_ultrasonic(void){
 }
 
 
+
 // Read infrared value
 void read_infrared(void){
   int sensorVal;
@@ -121,6 +140,7 @@ void read_infrared(void){
   sensorVal = analogRead(IR_SHORT_FRONT_PIN);
   ir_array.front.push(sensorVal);
 }
+
 
 
 // Pass in data and average the lot

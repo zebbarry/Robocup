@@ -45,6 +45,9 @@ int average_buf(CircularBuffer<int, IR_BUF_SIZE>* buf);
 // Convert analog value to mm
 int convert_ir_dist(int analog, enum ir_type type);
 
+int convert_ir_dist_short(int analog);
+int convert_ir_dist_medium(int analog);
+
 // Read ultrasonic value
 void send_ultrasonic(void);
 
