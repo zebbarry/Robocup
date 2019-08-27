@@ -1,4 +1,3 @@
-+
 /********************************************************************************
  *                               ROBOCUP TEMPLATE                              
  *        
@@ -228,15 +227,15 @@ void loop() {
     right_motor.writeMicroseconds(STOP_SPEED);
     tSet_motor.disable();
     tStart_robot.disable();
-    tWeight_scan.enable();
-    tCollect_weight.enable();
+//    tWeight_scan.enable();
+//    tCollect_weight.enable();
     state_change = false;
     led_off(BLUE);
   } else if (state_change) {
     tSet_motor.enable();
     tStart_robot.enable();
-    tWeight_scan.disable();
-    tCollect_weight.disable();
+//    tWeight_scan.disable();
+//    tCollect_weight.disable();
     state_change = false;
     led_off(GREEN);
   }

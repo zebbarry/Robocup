@@ -24,11 +24,11 @@ void start_robot(void){
 
   led_toggle(BLUE);
 
-  if (ir_averages.front < FRONT_LIMIT) {    // Object in front
+  if (ir_averages.front <= FRONT_LIMIT) {    // Object in front
     #if DEBUG
     Serial.println("Object in front");
     #endif
-    if (ir_averages.left < LEFT_LIMIT && ir_averages.right < RIGHT_LIMIT) { // Object in front and left and right
+    if (ir_averages.left <= LEFT_LIMIT && ir_averages.right <= RIGHT_LIMIT) { // Object in front and left and right
       #if DEBUG
       Serial.println("Cornered \n");
       #endif
@@ -79,7 +79,7 @@ void start_robot(void){
         motor_speed_l = FORWARD_FULL;
         motor_speed_r = FORWARD_FULL;
       }
-    } else if (ir_averages.left < LEFT_LIMIT && ir_averages.right < RIGHT_LIMIT) { // Cornered
+    } else if (ir_averages.left <= LEFT_LIMIT && ir_averages.right <= RIGHT_LIMIT) { // Cornered
       #if DEBUG
       Serial.println("Cornered with nothing in front \n");
       #endif
@@ -87,27 +87,27 @@ void start_robot(void){
       motor_speed_l = FORWARD_SLOW;
       motor_speed_r = FORWARD_SLOW;
        
-    } else if (ir_averages.left < LEFT_LIMIT) { // Wall to left
+    } else if (ir_averages.left <= LEFT_LIMIT) { // Wall to left
       #if DEBUG
       Serial.println("Object to the left \n");
       #endif
       // Turn right a little bit
-      motor_speed_l = FORWARD_FULL;
+      motor_speed_l = FORWARD_SLOW;
       motor_speed_r = STOP_SPEED;
       
-    } else if (ir_averages.right < RIGHT_LIMIT) {
+    } else if (ir_averages.right <= RIGHT_LIMIT) {
       #if DEBUG
       Serial.println("Object to the right \n");
       #endif
       // Turn left a little bit
       motor_speed_l = STOP_SPEED;
-      motor_speed_r = FORWARD_FULL;
+      motor_speed_r = FORWARD_SLOW;
     } else {
       #if DEBUG
       Serial.println("WTFFFFFFFFFF \n");
       #endif
       // Turn left a little bit
-      led_toggle(RED);
+      led_on(RED); 
       motor_speed_l = STOP_SPEED;
       motor_speed_r = STOP_SPEED;
       
