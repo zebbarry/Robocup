@@ -147,7 +147,7 @@ void pin_init(){
     pinMode(LIMIT_PIN, INPUT);
     sensor_init();
 //    tof_init();
-//    imu_init();
+    imu_init();
     
     #if DEBUG
     Serial.println("Pins have been initialised \n"); 
@@ -192,15 +192,15 @@ void task_init() {
   taskManager.addTask(tVictory_dance);      
 
   // Enable the tasks
-  tSend_ultrasonic.enable();
-  tRead_infrared.enable();
+//  tSend_ultrasonic.enable();
+//  tRead_infrared.enable();
 //  tRead_tof.enable();
-//  tRead_imu.enable();
-  tSensor_average.enable();
+  tRead_imu.enable();
+//  tSensor_average.enable();
 //  tSet_motor.enable();
 //  tStart_robot.enable();
-  tWeight_scan.enable();
-  tCollect_weight.enable();
+//  tWeight_scan.enable();
+//  tCollect_weight.enable();
 //  tCheck_watchdog.enable();
 //  tVictory_dance.enable();
 
