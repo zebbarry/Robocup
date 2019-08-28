@@ -10,6 +10,7 @@
 #include "sensors.h"
 #include "Arduino.h"
 #include "stepper.h"
+#include "motors.h"
 #include "pin_map.h"
 #include "led.h"
 
@@ -30,7 +31,11 @@ void weight_scan(void)
     #if DEBUG
     Serial.println("Inductive Active \n");
     #endif
+    left_motor.writeMicroseconds(STOP_SPEED);
+    right_motor.writeMicroseconds(STOP_SPEED);
     weight_state = WEIGHT_FOUND;
+    collection_mode = true;
+    state_change = true;
    } else if (WEIGHT_FOUND) {
     weight_state = NO_WEIGHT;
    }
@@ -41,13 +46,18 @@ void collect_weight(void)
 {
   /* When ready, collect the weight */
   int induct_state;
-   
+
+  led_toggle(RED);
+  
   switch (weight_state) {
     case WEIGHT_FOUND:
     if (!collection_complete) {
       #if DEBUG
       Serial.println("Collecting weight \n");
       #endif
+      
+      left_motor.writeMicroseconds(STOP_SPEED);
+      right_motor.writeMicroseconds(STOP_SPEED);
       digitalWrite(MAG_PIN, HIGH);
       delay(500);
       drive_step(100, VER_STEP_PIN, VER_DIR_PIN, DOWN);
@@ -63,11 +73,13 @@ void collect_weight(void)
         weight_state = NO_WEIGHT;
       } else {
         drive_step(HOR_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, RIGHT);
-//        drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
         digitalWrite(MAG_PIN, LOW);
-//        drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, UP);
         drive_step(HOR_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, LEFT);
         drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
+        
+        #if DEBUG
+        Serial.println("Collection complete \n");
+        #endif
 //        collection_complete = true;
       }
     }

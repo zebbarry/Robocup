@@ -17,18 +17,32 @@
 int32_t error_int, error_prev;
 
 // Start robot sequence
-void start_robot(void){
+void start_robot(void) {
   #if DEBUG
   Serial.println("Checking directions");
   #endif
 
   led_toggle(BLUE);
 
-  if (ir_averages.front <= FRONT_LIMIT) {    // Object in front
+  wall_follow();
+}
+
+
+void wall_follow(void) {
+  bool in_front, to_left, to_right, left_closer, right_closer;
+  in_front     = ir_averages.front <= FRONT_LIMIT;
+  to_left      = ir_averages.left  <= LEFT_LIMIT;
+  to_right     = ir_averages.right <= RIGHT_LIMIT;
+  left_closer  = ir_averages.left   < ir_averages.right;
+  right_closer = ir_averages.left   > ir_averages.right;
+  
+  
+  if (in_front) {    // Object in front
     #if DEBUG
     Serial.println("Object in front");
     #endif
-    if (ir_averages.left <= LEFT_LIMIT && ir_averages.right <= RIGHT_LIMIT) { // Object in front and left and right
+    
+    if (to_left && to_right) { // Object in front and left and right
       #if DEBUG
       Serial.println("Cornered \n");
       #endif
@@ -36,7 +50,7 @@ void start_robot(void){
       motor_speed_l = BACK_SLOW;
       motor_speed_r = BACK_SLOW;
       
-    } else if (ir_averages.left < ir_averages.right) {   // Object in front and closer to the left
+    } else if (left_closer) {   // Object in front and closer to the left
       #if DEBUG
       Serial.println("Object also closer to the left");
       #endif
@@ -54,19 +68,42 @@ void start_robot(void){
     }
     
   } else {
-    if (ir_averages.left > LEFT_LIMIT && ir_averages.right > RIGHT_LIMIT) {   // No walls in sight
+    if (to_left && to_right) { // Cornered
+      #if DEBUG
+      Serial.println("Cornered with nothing in front \n");
+      #endif
+      // Turn around
+      motor_speed_l = FORWARD_SLOW;
+      motor_speed_r = FORWARD_SLOW;
+       
+    } else if (to_left) { // Wall to left
+      #if DEBUG
+      Serial.println("Object to the left \n");
+      #endif
+      // Turn right a little bit
+      motor_speed_l = FORWARD_SLOW;
+      motor_speed_r = STOP_SPEED;
+      
+    } else if (to_right) {
+      #if DEBUG
+      Serial.println("Object to the right \n");
+      #endif
+      // Turn left a little bit
+      motor_speed_l = STOP_SPEED;
+      motor_speed_r = FORWARD_SLOW;
+    } else {
       #if DEBUG
       Serial.println("No walls too close");
       #endif
       
-      if (ir_averages.left < ir_averages.right) { // Closer to the left
+      if (left_closer) { // Closer to the left
         #if DEBUG
         Serial.println("Closer to the left \n");
         #endif
         motor_speed_l = FORWARD_FULL - STEP;
         motor_speed_r = FORWARD_FULL;
         
-      } else if (ir_averages.left > ir_averages.right) {
+      } else if (right_closer) {
         #if DEBUG
         Serial.println("Closer to the right \n");
         #endif
@@ -79,41 +116,10 @@ void start_robot(void){
         motor_speed_l = FORWARD_FULL;
         motor_speed_r = FORWARD_FULL;
       }
-    } else if (ir_averages.left <= LEFT_LIMIT && ir_averages.right <= RIGHT_LIMIT) { // Cornered
-      #if DEBUG
-      Serial.println("Cornered with nothing in front \n");
-      #endif
-      // Turn around
-      motor_speed_l = FORWARD_SLOW;
-      motor_speed_r = FORWARD_SLOW;
-       
-    } else if (ir_averages.left <= LEFT_LIMIT) { // Wall to left
-      #if DEBUG
-      Serial.println("Object to the left \n");
-      #endif
-      // Turn right a little bit
-      motor_speed_l = FORWARD_SLOW;
-      motor_speed_r = STOP_SPEED;
-      
-    } else if (ir_averages.right <= RIGHT_LIMIT) {
-      #if DEBUG
-      Serial.println("Object to the right \n");
-      #endif
-      // Turn left a little bit
-      motor_speed_l = STOP_SPEED;
-      motor_speed_r = FORWARD_SLOW;
-    } else {
-      #if DEBUG
-      Serial.println("WTFFFFFFFFFF \n");
-      #endif
-      // Turn left a little bit
-      led_on(RED); 
-      motor_speed_l = STOP_SPEED;
-      motor_speed_r = STOP_SPEED;
-      
     }
   }
 }
+
 
 int PID_control(int value, int desired, float Kp, float Ki, float Kd, int current_speed) {
   // Scales the values up by a constant so integers can be used. This removes rounding errors.

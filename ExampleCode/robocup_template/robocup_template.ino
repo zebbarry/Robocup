@@ -34,12 +34,12 @@
 // Task period Definitions
 // ALL OF THESE VALUES WILL NEED TO BE SET TO SOMETHING USEFUL !!!!!!!!!!!!!!!!!!!!
 #define US_SEND_TASK_PERIOD                 500
-#define IR_READ_TASK_PERIOD                 15
-#define TOF_READ_TASK_PERIOD                100
-#define IMU_READ_TASK_PERIOD                100
-#define SENSOR_AVERAGE_PERIOD               150
-#define SET_MOTOR_TASK_PERIOD               150
-#define START_ROBOT_TASK_PERIOD             150
+#define IR_READ_TASK_PERIOD                 20
+#define TOF_READ_TASK_PERIOD                200
+#define IMU_READ_TASK_PERIOD                200
+#define SENSOR_AVERAGE_PERIOD               200
+#define SET_MOTOR_TASK_PERIOD               200
+#define START_ROBOT_TASK_PERIOD             200
 #define WEIGHT_SCAN_TASK_PERIOD             200
 #define COLLECT_WEIGHT_TASK_PERIOD          200
 #define CHECK_WATCHDOG_TASK_PERIOD          40
@@ -165,8 +165,8 @@ void robot_init() {
     motor_speed_l = STOP_SPEED;
     motor_speed_r = STOP_SPEED;
     collection_complete = false;
-    collection_mode = true;
-    state_change = true;
+    collection_mode = false;
+    state_change = false;
 }
 
 //**********************************************************************************
@@ -192,15 +192,15 @@ void task_init() {
   taskManager.addTask(tVictory_dance);      
 
   // Enable the tasks
-//  tSend_ultrasonic.enable();
-//  tRead_infrared.enable();
+  tSend_ultrasonic.enable();
+  tRead_infrared.enable();
 //  tRead_tof.enable();
-  tRead_imu.enable();
-//  tSensor_average.enable();
+//  tRead_imu.enable();
+  tSensor_average.enable();
 //  tSet_motor.enable();
 //  tStart_robot.enable();
-//  tWeight_scan.enable();
-//  tCollect_weight.enable();
+  tWeight_scan.enable();
+  tCollect_weight.enable();
 //  tCheck_watchdog.enable();
 //  tVictory_dance.enable();
 
