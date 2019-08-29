@@ -155,6 +155,9 @@ void sensor_average(void){
   
   average = average_buf(&ir_array.front);
   ir_averages.front = convert_ir_dist(average, SHORT);
+  Serial.print(ir_array.front.last());
+  Serial.print(" ");
+  Serial.println(average);
   
   #if DEBUG
   Serial.print("Averaging the sensors (L, F, R) ");
