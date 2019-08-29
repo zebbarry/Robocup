@@ -26,7 +26,8 @@ typedef  struct {
 
 extern ir_averages_t ir_averages;
 extern int tof_reading;
-extern float imu_reading;
+extern float imu_s2s;
+extern float imu_f2b;
 
 extern bool collection_complete;
 extern bool collection_mode;

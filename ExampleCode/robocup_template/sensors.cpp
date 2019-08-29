@@ -58,11 +58,14 @@ void read_tof(void) {
 
 
 void read_imu(void) {
-  imu_reading = read_imu_eul_dir(ROLL);
+  imu_s2s = read_imu_eul_dir(PITCH);
+  imu_f2b = read_imu_eul_dir(ROLL);
   
   #if DEBUG
-  Serial.print("Reading IMU sensor: ");
-  Serial.println(imu_reading);
+  Serial.print("Reading IMU sensor (P, R): ");
+  Serial.print(imu_s2s);
+  Serial.print(", ");
+  Serial.println(imu_f2b);
   #endif
 }
 
