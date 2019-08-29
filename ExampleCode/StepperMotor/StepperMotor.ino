@@ -40,9 +40,9 @@ void setup()
   digitalWrite(VER_DIR_PIN,LOW);
   digitalWrite(HOR_DIR_PIN,LOW);
   
-  drive(VER_STEP_PIN, 2000, VER_DIR_PIN, DOWN);
-//  delay(100);
-//  drive(HOR_STEP_PIN, 1000, HOR_DIR_PIN, RIGHT);
+  drive(VER_STEP_PIN, 1800, VER_DIR_PIN, UP);
+  delay(100);
+  drive(HOR_STEP_PIN, 750, HOR_DIR_PIN, RIGHT);
 //  delay(100);
 //  drive(VER_STEP_PIN, 1000, VER_DIR_PIN, DOWN);
 //  delay(100);
