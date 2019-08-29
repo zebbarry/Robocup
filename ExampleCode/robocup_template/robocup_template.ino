@@ -40,8 +40,8 @@
 #define SENSOR_AVERAGE_PERIOD               200
 #define SET_MOTOR_TASK_PERIOD               200
 #define START_ROBOT_TASK_PERIOD             200
-#define WEIGHT_SCAN_TASK_PERIOD             200
-#define COLLECT_WEIGHT_TASK_PERIOD          200
+#define WEIGHT_SCAN_TASK_PERIOD             100
+#define COLLECT_WEIGHT_TASK_PERIOD          100
 #define CHECK_WATCHDOG_TASK_PERIOD          40
 #define VICTORY_DANCE_TASK_PERIOD           200
 
@@ -228,14 +228,14 @@ void loop() {
     tSet_motor.disable();
     tStart_robot.disable();
 //    tWeight_scan.enable();
-//    tCollect_weight.enable();
+    tCollect_weight.enable();
     state_change = false;
     led_off(BLUE);
   } else if (state_change) {
     tSet_motor.enable();
     tStart_robot.enable();
 //    tWeight_scan.disable();
-//    tCollect_weight.disable();
+    tCollect_weight.disable();
     state_change = false;
     led_off(GREEN);
   }

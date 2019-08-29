@@ -15,6 +15,7 @@
 #include "led.h"
 
 enum weight_s weight_state;
+int attempts;
 
 void weight_scan(void) 
 {
@@ -27,7 +28,7 @@ void weight_scan(void)
    led_toggle(GREEN);
 
    int induct_state = digitalRead(INDUCTIVE_PIN);
-   if (induct_state) {
+   if (induct_state && attempts < MAX_ATTEMPTS) {
     #if DEBUG
     Serial.println("Inductive Active \n");
     #endif
@@ -36,7 +37,12 @@ void weight_scan(void)
     weight_state = WEIGHT_FOUND;
     collection_mode = true;
     state_change = true;
-   } else if (WEIGHT_FOUND) {
+   } else if (weight_state == WEIGHT_FOUND){
+    left_motor.writeMicroseconds(MAX_SPEED);
+    right_motor.writeMicroseconds(MAX_SPEED);
+    collection_mode = false;
+    state_change = true;
+    attempts = 0;
     weight_state = NO_WEIGHT;
    }
 }
@@ -56,8 +62,6 @@ void collect_weight(void)
       Serial.println("Collecting weight \n");
       #endif
       
-      left_motor.writeMicroseconds(STOP_SPEED);
-      right_motor.writeMicroseconds(STOP_SPEED);
       digitalWrite(MAG_PIN, HIGH);
       delay(500);
       drive_step(100, VER_STEP_PIN, VER_DIR_PIN, DOWN);
@@ -70,7 +74,7 @@ void collect_weight(void)
         Serial.println("Inductive not active \n");
         #endif
         drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
-        weight_state = NO_WEIGHT;
+        attempts += 1;
       } else {
         drive_step(HOR_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, RIGHT);
         digitalWrite(MAG_PIN, LOW);
@@ -98,8 +102,6 @@ void victory_dance(void) {
   #endif
   digitalWrite(FAN_PIN, HIGH);
   delay(5000);
-//  drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
-  digitalWrite(MAG_PIN, LOW);
   digitalWrite(FAN_PIN, LOW);
   delay(1000);
   collection_complete = false;
