@@ -21,14 +21,12 @@ void weight_scan(void)
 {
   /* Use sensors to search for weights,
    * Switch to WEIGHT_FOUND state if a weight is found   */
-   #if DEBUG
-   Serial.println("Looking for weights \n");
-   #endif
-
-   led_toggle(GREEN);
-
-   int induct_state = digitalRead(INDUCTIVE_PIN);
-   if (induct_state && attempts < MAX_ATTEMPTS) {
+  #if DEBUG
+  Serial.println("Looking for weights \n");
+  #endif
+  
+  int induct_state = digitalRead(INDUCTIVE_PIN);
+  if (induct_state && attempts < MAX_ATTEMPTS) {
     #if DEBUG
     Serial.println("Inductive Active \n");
     #endif
@@ -37,14 +35,14 @@ void weight_scan(void)
     weight_state = WEIGHT_FOUND;
     collection_mode = true;
     state_change = true;
-   } else if (weight_state == WEIGHT_FOUND){
+  } else if (weight_state == WEIGHT_FOUND){
     left_motor.writeMicroseconds(MAX_SPEED);
     right_motor.writeMicroseconds(MAX_SPEED);
     collection_mode = false;
     state_change = true;
     attempts = 0;
     weight_state = NO_WEIGHT;
-   }
+  }
 }
 
 
@@ -52,8 +50,6 @@ void collect_weight(void)
 {
   /* When ready, collect the weight */
   int induct_state;
-
-  led_toggle(RED);
   
   switch (weight_state) {
     case WEIGHT_FOUND:
@@ -64,8 +60,8 @@ void collect_weight(void)
       
       digitalWrite(MAG_PIN, HIGH);
       delay(500);
-      drive_step(100, VER_STEP_PIN, VER_DIR_PIN, DOWN);
-      drive_step(100, VER_STEP_PIN, VER_DIR_PIN, UP);
+      drive_step(150, VER_STEP_PIN, VER_DIR_PIN, DOWN);
+      drive_step(150, VER_STEP_PIN, VER_DIR_PIN, UP);
       drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, UP);
       induct_state = digitalRead(INDUCTIVE_PIN);
       

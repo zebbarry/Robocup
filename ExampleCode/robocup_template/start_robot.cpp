@@ -22,8 +22,6 @@ void start_robot(void) {
   Serial.println("Checking directions");
   #endif
 
-  led_toggle(BLUE);
-
   wall_follow();
 }
 
