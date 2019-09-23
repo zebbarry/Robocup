@@ -8,10 +8,10 @@
 
 #define LEFT_LIMIT  200 // mm
 #define RIGHT_LIMIT 200
-#define FRONT_LIMIT 200
+#define FRONT_LIMIT 150
 #define DESIRED_LIM 300
 #define STEP        150
-#define FORWARD_FULL 1700
+#define FORWARD_FULL 2000
 #define FORWARD_SLOW 1700
 #define BACK_FULL    1200
 #define BACK_SLOW    1300

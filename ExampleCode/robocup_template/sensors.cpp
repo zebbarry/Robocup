@@ -58,8 +58,10 @@ void read_tof(void) {
 
 
 void read_imu(void) {
-  imu_s2s = read_imu_eul_dir(PITCH);
-  imu_f2b = read_imu_eul_dir(ROLL);
+  sEul_t imu_eul = read_imu_eul();
+  
+  imu_s2s = imu_eul.pitch;
+  imu_f2b = imu_eul.roll;
   
   #if DEBUG
   Serial.print("Reading IMU sensor (P, R): ");
@@ -122,12 +124,20 @@ void send_ultrasonic(void){
   Serial.println("Sending offensive ultrasonic pulse \n");
   #endif
   
+  
+  int start_t, end_t, diff_t;
+  start_t = micros();
+
   static bool state = false;
   if (state) {
     digitalWrite(US_TRIG_PIN, HIGH);
   } else {
     digitalWrite(US_TRIG_PIN, LOW);
   }
+
+  end_t = micros();
+  diff_t = end_t - start_t;
+  Serial.println(diff_t);
 }
 
 
@@ -149,7 +159,6 @@ void read_infrared(void){
 
 // Pass in data and average the lot
 void sensor_average(void){
-  
   int average = average_buf(&ir_array.left);
   ir_averages.left = convert_ir_dist(average, SHORT);
   

@@ -37,9 +37,9 @@
 #define IR_READ_TASK_PERIOD                 20
 #define TOF_READ_TASK_PERIOD                200
 #define IMU_READ_TASK_PERIOD                200
-#define SENSOR_AVERAGE_PERIOD               200
-#define SET_MOTOR_TASK_PERIOD               200
-#define START_ROBOT_TASK_PERIOD             200
+#define SENSOR_AVERAGE_PERIOD               100
+#define SET_MOTOR_TASK_PERIOD               100
+#define START_ROBOT_TASK_PERIOD             100
 #define WEIGHT_SCAN_TASK_PERIOD             100
 #define COLLECT_WEIGHT_TASK_PERIOD          100
 #define CHECK_WATCHDOG_TASK_PERIOD          40
@@ -196,7 +196,7 @@ void task_init() {
   tSend_ultrasonic.enable();
   tRead_infrared.enable();
 //  tRead_tof.enable();
-//  tRead_imu.enable();
+  tRead_imu.enable();
   tSensor_average.enable();
 //  tSet_motor.enable();
 //  tStart_robot.enable();
@@ -232,6 +232,7 @@ void loop() {
     tCollect_weight.enable();
     state_change = false;
     led_off(BLUE);
+    led_on(GREEN);
   } else if (state_change) {
     tSet_motor.enable();
     tStart_robot.enable();
@@ -239,6 +240,7 @@ void loop() {
     tCollect_weight.disable();
     state_change = false;
     led_off(GREEN);
+    led_on(BLUE);
   }
   
   taskManager.execute();    //execute the scheduler
