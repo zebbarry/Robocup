@@ -26,6 +26,7 @@
 #include "stepper.h"
 #include "led.h"
 #include "imu.h"
+#include "irposition.h"
 
 //**********************************************************************************
 // Local Definitions
@@ -35,6 +36,7 @@
 // ALL OF THESE VALUES WILL NEED TO BE SET TO SOMETHING USEFUL !!!!!!!!!!!!!!!!!!!!
 #define US_SEND_TASK_PERIOD                 500
 #define IR_READ_TASK_PERIOD                 20
+#define CAM_READ_TASK_PERIOD                100
 #define TOF_READ_TASK_PERIOD                200
 #define IMU_READ_TASK_PERIOD                200
 #define SENSOR_AVERAGE_PERIOD               100
@@ -49,6 +51,7 @@
 // -1 means indefinitely
 #define US_SEND_TASK_NUM_EXECUTE           -1
 #define IR_READ_TASK_NUM_EXECUTE           -1
+#define CAM_READ_TASK_NUM_EXECUTE          -1
 #define TOF_READ_TASK_NUM_EXECUTE          -1
 #define IMU_READ_TASK_NUM_EXECUTE          -1
 #define SENSOR_AVERAGE_NUM_EXECUTE         -1
@@ -75,6 +78,8 @@ int current_pos;
 int tof_reading;
 float imu_s2s;
 float imu_f2b;
+int cam_x[4];
+int cam_y[4];
 bool collection_complete;
 bool collection_mode;
 bool state_change;
@@ -90,6 +95,7 @@ bool state_change;
 Task tSend_ultrasonic(US_SEND_TASK_PERIOD,       US_SEND_TASK_NUM_EXECUTE,        &send_ultrasonic);
 Task tRead_infrared(IR_READ_TASK_PERIOD,         IR_READ_TASK_NUM_EXECUTE,        &read_infrared);
 Task tRead_tof(TOF_READ_TASK_PERIOD,             TOF_READ_TASK_NUM_EXECUTE,       &read_tof);
+Task tRead_cam(CAM_READ_TASK_PERIOD,             CAM_READ_TASK_NUM_EXECUTE,       &read_cam);
 Task tRead_imu(IMU_READ_TASK_PERIOD,             IMU_READ_TASK_NUM_EXECUTE,       &read_imu);
 Task tSensor_average(SENSOR_AVERAGE_PERIOD,      SENSOR_AVERAGE_NUM_EXECUTE,      &sensor_average);
 
@@ -149,6 +155,7 @@ void pin_init(){
     sensor_init();
 //    tof_init();
     imu_init();
+    cam_init();
     
     #if DEBUG
     Serial.println("Pins have been initialised \n"); 
@@ -196,6 +203,7 @@ void task_init() {
   tSend_ultrasonic.enable();
   tRead_infrared.enable();
 //  tRead_tof.enable();
+  tRead_cam.enable();
   tRead_imu.enable();
   tSensor_average.enable();
 //  tSet_motor.enable();
