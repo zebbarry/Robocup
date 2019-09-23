@@ -1,33 +1,38 @@
 //************************************
-//         start_robot.cpp       
+//         navigation.cpp       
 //************************************
 
  // This file contains functions used drive robot
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "start_robot.h"
+#include "navigation.h"
 #include "motors.h"
 #include "sensors.h"
 #include "Arduino.h"
+#include "irposition.h"
 #include "pin_map.h"
 #include "led.h"
 
 // Local definitions
+bool in_front, to_left, to_right, left_closer, right_closer;
 int32_t error_int, error_prev;
 
-// Start robot sequence
-void start_robot(void) {
+// Navigation sequence
+void navigate(void) {
   #if DEBUG
   Serial.println("Checking directions");
   #endif
 
   wall_follow();
+  
+  if (cam_x[0] < 1023) {
+    weight_follow();
+  }
 }
 
 
 void wall_follow(void) {
-  bool in_front, to_left, to_right, left_closer, right_closer;
   in_front     = ir_averages.front <= FRONT_LIMIT;
   to_left      = ir_averages.left  <= LEFT_LIMIT;
   to_right     = ir_averages.right <= RIGHT_LIMIT;
@@ -119,10 +124,29 @@ void wall_follow(void) {
 }
 
 
-int PID_control(int value, int desired, float Kp, float Ki, float Kd, int current_speed) {
-  // Scales the values up by a constant so integers can be used. This removes rounding errors.
-  int error = value - desired;
+int calc_weight_error(void) {
+  // Calc distance between current weight pos and desired.
+  return DESIRED_POS - cam_x[0];
+}
 
+
+void weight_follow(void) {
+  int error = calc_weight_error();
+
+  int speed_change = PID_control(error, KP, KI, KD, motor_speed_l);
+  int speed_l = FORWARD_SLOW + speed_change;
+  int speed_r = FORWARD_SLOW - speed_change;
+
+  Serial.print("Calculating PID control (E, L, R): ");
+  Serial.print(error);
+  Serial.print(",");
+  Serial.print(speed_l);
+  Serial.print(",");
+  Serial.println(speed_r);
+}
+
+
+int PID_control(int error, float Kp, float Ki, float Kd, int current_speed) {
   // Proportional: The error times the proportional gain (Kp)
   int P = error * Kp;
 
@@ -130,7 +154,7 @@ int PID_control(int value, int desired, float Kp, float Ki, float Kd, int curren
   // and more than minimum. This removes integral windup.
   if (current_speed < FORWARD_FULL && current_speed > BACK_FULL)
   {
-      error_int += (2 * error + DUTYSCALER) / 2 / DUTYSCALER;
+      error_int += error;
   }
 
   // Integral: Multiply the error sum by the integral gain (Ki)
@@ -143,7 +167,7 @@ int PID_control(int value, int desired, float Kp, float Ki, float Kd, int curren
 
   // Combine the proportional, integral and derivative components and then scales
   // back down using integer division. This reduces rounding error.
-  int result = (2 * (P + I + D) + DUTYSCALER) / 2 / DUTYSCALER;
+  int result = P + I + D;
 
   return result;
 }

@@ -13,6 +13,7 @@
 #include "Arduino.h"
 #include <Wire.h>
 #include "irposition.h"
+#include "pin_map.h"
 
 int IRsensorAddress = 0xB0;
 
@@ -29,7 +30,11 @@ void Write_2bytes(byte d1, byte d2)
 }
 
 void cam_init(void)
-{
+{  
+  #if DEBUG
+  Serial.print("Initialising ir positioning camera");
+  #endif
+  
   slaveAddress = IRsensorAddress >> 1;   // This results in 0x21 as the address to pass to TWI
   // IR sensor initialize
   Write_2bytes(0x30, 0x01); delay(10);
@@ -83,26 +88,18 @@ void read_cam(void)
   cam_x[3] += (s & 0x30) << 4;
   cam_y[3] += (s & 0xC0) << 2;
 
+  #if DEBUG
+  Serial.print("Reading ir positioning camera: ");
+  
   //Display data on the serial port
   for (i = 0; i < 4; i++)
   {
-    if (cam_x[i] < 1000)
-      Serial.print("");
-    if (cam_x[i] < 100)
-      Serial.print("");
-    if (cam_x[i] < 10)
-      Serial.print("");
     Serial.print( int(cam_x[i]) );
     Serial.print(",");
-    if (cam_y[i] < 1000)
-      Serial.print("");
-    if (cam_y[i] < 100)
-      Serial.print("");
-    if (cam_y[i] < 10)
-      Serial.print("");
     Serial.print( int(cam_y[i]) );
     if (i < 3)
       Serial.print(",");
   }
   Serial.println("");
+  #endif
 }

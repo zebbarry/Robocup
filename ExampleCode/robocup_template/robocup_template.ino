@@ -21,7 +21,7 @@
 #include "motors.h"
 #include "sensors.h"
 #include "weight_collection.h" 
-#include "start_robot.h"
+#include "navigation.h"
 #include "pin_map.h"
 #include "stepper.h"
 #include "led.h"
@@ -41,7 +41,7 @@
 #define IMU_READ_TASK_PERIOD                200
 #define SENSOR_AVERAGE_PERIOD               100
 #define SET_MOTOR_TASK_PERIOD               100
-#define START_ROBOT_TASK_PERIOD             100
+#define NAVIGATE_TASK_PERIOD                100
 #define WEIGHT_SCAN_TASK_PERIOD             100
 #define COLLECT_WEIGHT_TASK_PERIOD          100
 #define CHECK_WATCHDOG_TASK_PERIOD          40
@@ -56,7 +56,7 @@
 #define IMU_READ_TASK_NUM_EXECUTE          -1
 #define SENSOR_AVERAGE_NUM_EXECUTE         -1
 #define SET_MOTOR_TASK_NUM_EXECUTE         -1
-#define START_ROBOT_TASK_NUM_EXECUTE       -1
+#define NAVIGATE_TASK_NUM_EXECUTE          -1
 #define WEIGHT_SCAN_TASK_NUM_EXECUTE       -1
 #define COLLECT_WEIGHT_TASK_NUM_EXECUTE    -1
 #define CHECK_WATCHDOG_TASK_NUM_EXECUTE    -1
@@ -103,7 +103,7 @@ Task tSensor_average(SENSOR_AVERAGE_PERIOD,      SENSOR_AVERAGE_NUM_EXECUTE,    
 Task tSet_motor(SET_MOTOR_TASK_PERIOD,           SET_MOTOR_TASK_NUM_EXECUTE,      &set_motor);
 
 // Task to start robot and check for input
-Task tStart_robot(START_ROBOT_TASK_PERIOD,       START_ROBOT_TASK_NUM_EXECUTE,    &start_robot);
+Task tNavigate(NAVIGATE_TASK_PERIOD,             NAVIGATE_TASK_NUM_EXECUTE,       &navigate);
 
 // Tasks to scan for weights and collection upon detection
 Task tWeight_scan(WEIGHT_SCAN_TASK_PERIOD,       WEIGHT_SCAN_TASK_NUM_EXECUTE,    &weight_scan);
@@ -189,10 +189,11 @@ void task_init() {
   taskManager.addTask(tSend_ultrasonic);   //reading ultrasonic 
   taskManager.addTask(tRead_infrared);
   taskManager.addTask(tRead_tof);
+  taskManager.addTask(tRead_cam);
   taskManager.addTask(tRead_imu);
   taskManager.addTask(tSensor_average);
   taskManager.addTask(tSet_motor);
-  taskManager.addTask(tStart_robot);
+  taskManager.addTask(tNavigate);
   taskManager.addTask(tWeight_scan);
   taskManager.addTask(tCollect_weight);
 
@@ -207,7 +208,7 @@ void task_init() {
   tRead_imu.enable();
   tSensor_average.enable();
 //  tSet_motor.enable();
-//  tStart_robot.enable();
+  tNavigate.enable();
   tWeight_scan.enable();
   tCollect_weight.enable();
 //  tCheck_watchdog.enable();
@@ -231,11 +232,11 @@ void loop() {
 //    tVictory_dance.disable();
 //  }
 
-  if (collection_mode && state_change) {
+  if (state_change && collection_mode) {
     left_motor.writeMicroseconds(STOP_SPEED);
     right_motor.writeMicroseconds(STOP_SPEED);
     tSet_motor.disable();
-    tStart_robot.disable();
+    tNavigate.disable();
 //    tWeight_scan.enable();
     tCollect_weight.enable();
     state_change = false;
@@ -243,7 +244,7 @@ void loop() {
     led_on(GREEN);
   } else if (state_change) {
     tSet_motor.enable();
-    tStart_robot.enable();
+    tNavigate.enable();
 //    tWeight_scan.disable();
     tCollect_weight.disable();
     state_change = false;
