@@ -149,13 +149,16 @@ void pin_init(){
 
     pinMode(MAG_PIN, OUTPUT);
     digitalWrite(MAG_PIN, LOW);
-    pinMode(FAN_PIN, OUTPUT);
-    digitalWrite(FAN_PIN, LOW);
     pinMode(LIMIT_PIN, INPUT);
+    pinMode(CHAN_PIN, INPUT);
+    pinMode(HOR_CALIB, INPUT);
+    pinMode(VER_CALIB, INPUT);
+    
     sensor_init();
 //    tof_init();
     imu_init();
     cam_init();
+    gantry_init();
     
     #if DEBUG
     Serial.println("Pins have been initialised \n"); 
@@ -201,16 +204,16 @@ void task_init() {
   taskManager.addTask(tVictory_dance);      
 
   // Enable the tasks
-  tSend_ultrasonic.enable();
-  tRead_infrared.enable();
+//  tSend_ultrasonic.enable();
+//  tRead_infrared.enable();
 //  tRead_tof.enable();
-  tRead_cam.enable();
-  tRead_imu.enable();
-  tSensor_average.enable();
+//  tRead_cam.enable();
+//  tRead_imu.enable();
+//  tSensor_average.enable();
 //  tSet_motor.enable();
-  tNavigate.enable();
-  tWeight_scan.enable();
-  tCollect_weight.enable();
+//  tNavigate.enable();
+//  tWeight_scan.enable();
+//  tCollect_weight.enable();
 //  tCheck_watchdog.enable();
 //  tVictory_dance.enable();
 

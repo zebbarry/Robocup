@@ -24,7 +24,7 @@ void navigate(void) {
   Serial.println("Checking directions");
   #endif
 
-  wall_follow();
+  //wall_follow();
   
   if (cam_x[0] < 1023) {
     weight_follow();
@@ -132,10 +132,15 @@ int calc_weight_error(void) {
 
 void weight_follow(void) {
   int error = calc_weight_error();
+  bool at_max = false;
 
-  int speed_change = PID_control(error, KP, KI, KD, motor_speed_l);
-  int speed_l = FORWARD_SLOW + speed_change;
-  int speed_r = FORWARD_SLOW - speed_change;
+  if (motor_speed_l >= FORWARD_FULL || motor_speed_l <= BACK_FULL || motor_speed_r >= FORWARD_FULL || motor_speed_r <= BACK_FULL) {
+    at_max = true;
+  }
+
+  int speed_change = PID_control(error, KP, KI, KD, at_max);
+  int speed_l = PID_HOLD + speed_change;
+  int speed_r = PID_HOLD - speed_change;
 
   Serial.print("Calculating PID control (E, L, R): ");
   Serial.print(error);
@@ -146,13 +151,13 @@ void weight_follow(void) {
 }
 
 
-int PID_control(int error, float Kp, float Ki, float Kd, int current_speed) {
+int PID_control(int error, float Kp, float Ki, float Kd, bool at_max) {
   // Proportional: The error times the proportional gain (Kp)
   int P = error * Kp;
 
   // Add the current Error to the error integral if current speed is less than maximum
   // and more than minimum. This removes integral windup.
-  if (current_speed < FORWARD_FULL && current_speed > BACK_FULL)
+  if (!at_max)
   {
       error_int += error;
   }

@@ -46,6 +46,7 @@ BNO::eStatus_t imu_init(void) {
   } else {
     Serial.println("BNO begin success");
   }
+  Serial.println("");
   #endif
 
   return result;

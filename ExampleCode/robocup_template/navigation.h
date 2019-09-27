@@ -19,6 +19,7 @@
 #define KP           0.8
 #define KI           0
 #define KD           0
+#define PID_HOLD     STOP_SPEED
 
 
 // Navigation sequence
@@ -30,6 +31,6 @@ void weight_follow(void);
 
 int calc_weight_error(void);
 
-int PID_control(int error, float Kp, float Ki, float Kd, int current_speed);
+int PID_control(int error, float Kp, float Ki, float Kd, bool at_max);
 
 #endif /* NAVIGATION_H_ */

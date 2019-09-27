@@ -6,7 +6,7 @@
 #define PIN_MAP_H_
 
 // Debug mode -- 1 if compile serial outputs
-#define DEBUG 0
+#define DEBUG 1
 
 // Arduino ports
 // Analog
@@ -94,9 +94,12 @@
 #define GREEN               DI6
 #define BLUE                DI7
 #define US_TRIG_PIN         A4 // Wrong
-#define LIMIT_PIN           DI2
-#define MAG_PIN             DI1
+#define LIMIT_PIN           DO4
+#define MAG_PIN             DI3
 #define FAN_PIN             DI7 // Wrong
+#define CHAN_PIN            DI4
+#define VER_CALIB           DI1
+#define HOR_CALIB           DI2
 
 // Stepper Pins
 #define HOR_DIR_PIN         DO8

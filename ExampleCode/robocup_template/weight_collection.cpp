@@ -17,6 +17,58 @@
 enum weight_s weight_state;
 int attempts;
 
+
+void gantry_init(void)
+{
+  #if DEBUG
+  Serial.println("Initialising gantry");
+  #endif
+
+  bool hor_trig, ver_trig, Q1, Q2, Q3;
+  int start_t, current_t;
+  hor_trig = false;
+  ver_trig = false;
+  start_t = millis();
+  
+  while(!hor_trig && current_t - start_t < MAX_TIME) {
+    drive_step(CALIB_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, LEFT);
+    
+    Q3 = Q2;
+    Q2 = Q1;
+    Q1 = !digitalRead(HOR_CALIB);
+    if (Q1 && !Q2 && !Q3) {
+      hor_trig = true;
+    }    
+    current_t = millis();
+  }
+  
+  drive_step(HOR_RETURN, HOR_STEP_PIN, HOR_DIR_PIN, RIGHT);
+  
+  #if DEBUG
+  Serial.println("Horizontal stepper initialised");
+  #endif
+  
+  while(!ver_trig && current_t - start_t < MAX_TIME) {
+    drive_step(CALIB_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
+
+    Q3 = Q2;
+    Q2 = Q1;
+    Q1 = !digitalRead(VER_CALIB);
+    if (Q1 && !Q2 && !Q3) {
+      ver_trig = true;
+    }
+    current_t = millis();
+  }
+  
+  drive_step(VER_RETURN, VER_STEP_PIN, VER_DIR_PIN, UP);
+  
+  #if DEBUG
+  Serial.println("Vertical stepper initialised\n");
+  #endif
+}
+
+
+
 void weight_scan(void) 
 {
   /* Use sensors to search for weights,
