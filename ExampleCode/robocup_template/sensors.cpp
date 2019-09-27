@@ -124,20 +124,12 @@ void send_ultrasonic(void){
   Serial.println("Sending offensive ultrasonic pulse \n");
   #endif
   
-  
-  int start_t, end_t, diff_t;
-  start_t = micros();
-
   static bool state = false;
   if (state) {
     digitalWrite(US_TRIG_PIN, HIGH);
   } else {
     digitalWrite(US_TRIG_PIN, LOW);
   }
-
-  end_t = micros();
-  diff_t = end_t - start_t;
-  Serial.println(diff_t);
 }
 
 
