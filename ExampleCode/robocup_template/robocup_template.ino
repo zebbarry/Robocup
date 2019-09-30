@@ -158,7 +158,7 @@ void pin_init(){
 //    tof_init();
     imu_init();
     cam_init();
-    gantry_init();
+//    gantry_init();
     
     #if DEBUG
     Serial.println("Pins have been initialised \n"); 
@@ -207,7 +207,7 @@ void task_init() {
 //  tSend_ultrasonic.enable();
 //  tRead_infrared.enable();
 //  tRead_tof.enable();
-//  tRead_cam.enable();
+  tRead_cam.enable();
 //  tRead_imu.enable();
 //  tSensor_average.enable();
 //  tSet_motor.enable();
@@ -235,25 +235,25 @@ void loop() {
 //    tVictory_dance.disable();
 //  }
 
-  if (state_change && collection_mode) {
-    left_motor.writeMicroseconds(STOP_SPEED);
-    right_motor.writeMicroseconds(STOP_SPEED);
-    tSet_motor.disable();
-    tNavigate.disable();
-//    tWeight_scan.enable();
-    tCollect_weight.enable();
-    state_change = false;
-    led_off(BLUE);
-    led_on(GREEN);
-  } else if (state_change) {
-    tSet_motor.enable();
-    tNavigate.enable();
-//    tWeight_scan.disable();
-    tCollect_weight.disable();
-    state_change = false;
-    led_off(GREEN);
-    led_on(BLUE);
-  }
+//  if (state_change && collection_mode) {
+//    left_motor.writeMicroseconds(STOP_SPEED);
+//    right_motor.writeMicroseconds(STOP_SPEED);
+//    tSet_motor.disable();
+//    tNavigate.disable();
+////    tWeight_scan.enable();
+//    tCollect_weight.enable();
+//    state_change = false;
+//    led_off(BLUE);
+//    led_on(GREEN);
+//  } else if (state_change) {
+//    tSet_motor.enable();
+//    tNavigate.enable();
+////    tWeight_scan.disable();
+//    tCollect_weight.disable();
+//    state_change = false;
+//    led_off(GREEN);
+//    led_on(BLUE);
+//  }
   
   taskManager.execute();    //execute the scheduler
 }

@@ -33,7 +33,7 @@ void Write_2bytes(byte d1, byte d2)
 void cam_init(void)
 {  
   #if DEBUG
-  Serial.println("Initialising ir positioning camera");
+  Serial.println("Initialising IR positioning camera");
   #endif
   
   slaveAddress = IRsensorAddress >> 1;   // This results in 0x21 as the address to pass to TWI
@@ -49,6 +49,7 @@ void cam_init(void)
 
 void read_cam(void)
 {
+  int start_t = millis();
   //IR sensor read
   Wire.beginTransmission(slaveAddress);
   Wire.write(0x36);
@@ -103,4 +104,6 @@ void read_cam(void)
   }
   Serial.println("");
   #endif
+  int end_t = millis();
+  Serial.println(end_t-start_t);
 }
