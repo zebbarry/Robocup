@@ -212,8 +212,8 @@ void task_init() {
 //  tSensor_average.enable();
 //  tSet_motor.enable();
 //  tNavigate.enable();
-//  tWeight_scan.enable();
-//  tCollect_weight.enable();
+  tWeight_scan.enable();
+  tCollect_weight.enable();
 //  tCheck_watchdog.enable();
 //  tVictory_dance.enable();
 
@@ -235,25 +235,25 @@ void loop() {
 //    tVictory_dance.disable();
 //  }
 
-  if (state_change && collection_mode) {
-    left_motor.writeMicroseconds(STOP_SPEED);
-    right_motor.writeMicroseconds(STOP_SPEED);
-    tSet_motor.disable();
-    tNavigate.disable();
-//    tWeight_scan.enable();
-    tCollect_weight.enable();
-    state_change = false;
-    led_off(BLUE);
-    led_on(GREEN);
-  } else if (state_change) {
-    tSet_motor.enable();
-    tNavigate.enable();
-//    tWeight_scan.disable();
-    tCollect_weight.disable();
-    state_change = false;
-    led_off(GREEN);
-    led_on(BLUE);
-  }
+//  if (state_change && collection_mode) {
+//    left_motor.writeMicroseconds(STOP_SPEED);
+//    right_motor.writeMicroseconds(STOP_SPEED);
+//    tSet_motor.disable();
+//    tNavigate.disable();
+////    tWeight_scan.enable();
+//    tCollect_weight.enable();
+//    state_change = false;
+//    led_off(BLUE);
+//    led_on(GREEN);
+//  } else if (state_change) {
+//    tSet_motor.enable();
+//    tNavigate.enable();
+////    tWeight_scan.disable();
+//    tCollect_weight.disable();
+//    state_change = false;
+//    led_off(GREEN);
+//    led_on(BLUE);
+//  }
   
   taskManager.execute();    //execute the scheduler
 }

@@ -21,7 +21,7 @@
 #define MAX_ATTEMPTS  3
 #define MAX_TIME      20 * 1000
 #define CALIB_STEPS   1
-#define HOR_RETURN    35
+#define HOR_RETURN    50
 #define VER_RETURN    90
 
 //states for swapping between searching and collecting
