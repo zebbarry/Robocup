@@ -29,10 +29,6 @@ extern int tof_reading;
 extern float imu_s2s;
 extern float imu_f2b;
 
-extern bool collection_complete;
-extern bool collection_mode;
-extern bool state_change;
-
 void sensor_init(void);
 
 void tof_init(void);

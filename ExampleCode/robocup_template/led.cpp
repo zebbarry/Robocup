@@ -54,31 +54,17 @@ bool led_toggle(int led_pin) {
 }
 
 
-void led_write(int red_pin, int green_pin, int blue_pin) {
+void led_set(int red_pin, int green_pin, int blue_pin, bool red, bool green, bool blue) {
   #if DEBUG
   Serial.print("Set led state (RGB) ");
-  Serial.print(red_pin);
+  Serial.print(red);
   Serial.print(" ");
-  Serial.print(green_pin);
+  Serial.print(green);
   Serial.print(" ");
-  Serial.println(blue_pin);
+  Serial.println(blue);
   #endif
   
-  if (red_pin) {
-    digitalWrite(red_pin, HIGH);
-  } else {
-    digitalWrite(red_pin, LOW);
-  }
-
-  if (green_pin) {
-    digitalWrite(green_pin, HIGH);
-  } else {
-    digitalWrite(green_pin, LOW);
-  }
-
-  if (blue_pin) {
-    digitalWrite(blue_pin, HIGH);
-  } else {
-    digitalWrite(blue_pin, LOW);
-  }
+  digitalWrite(red_pin, red);
+  digitalWrite(green_pin, green);
+  digitalWrite(blue_pin, blue);
 }

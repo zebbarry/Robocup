@@ -9,8 +9,8 @@
 #include "Arduino.h"
 #include <Wire.h>
 
-extern int cam_x[4];
-extern int cam_y[4];
+extern int cam_x;
+extern int cam_y;
 
 void Write_2bytes(byte d1, byte d2);
 

@@ -24,9 +24,6 @@
 #define HOR_RETURN    50
 #define VER_RETURN    90
 
-//states for swapping between searching and collecting
-enum weight_s {NO_WEIGHT = 0, WEIGHT_FOUND};
-
 
 void gantry_init(void);
 

@@ -14,7 +14,6 @@
 #include "pin_map.h"
 #include "led.h"
 
-enum weight_s weight_state;
 int attempts;
 
 
@@ -76,6 +75,13 @@ void weight_scan(void)
   #if DEBUG
   Serial.println("Looking for weights \n");
   #endif
+
+  int weight_in_channel = !digitalRead(CHAN_PIN);
+  if (weight_in_channel) {
+    robot_state = WEIGHT_AHEAD;
+    left_motor.writeMicroseconds(STOP_SPEED);
+    right_motor.writeMicroseconds(STOP_SPEED);
+  }
   
   int induct_state = digitalRead(INDUCTIVE_PIN);
   if (induct_state && attempts < MAX_ATTEMPTS) {
@@ -84,14 +90,12 @@ void weight_scan(void)
     #endif
     left_motor.writeMicroseconds(STOP_SPEED);
     right_motor.writeMicroseconds(STOP_SPEED);
-    weight_state = WEIGHT_FOUND;
-    collection_mode = true;
+    robot_state = WEIGHT_FOUND;
     state_change = true;
-  } else if (weight_state == WEIGHT_FOUND){
-    collection_mode = false;
+  } else if (robot_state == WEIGHT_FOUND){
     state_change = true;
+    robot_state = NO_WEIGHT;
     attempts = 0;
-    weight_state = NO_WEIGHT;
   }
 }
 
@@ -101,7 +105,7 @@ void collect_weight(void)
   /* When ready, collect the weight */
   int induct_state;
   
-  switch (weight_state) {
+  switch (robot_state) {
     case WEIGHT_FOUND:
     if (!collection_complete) {
       #if DEBUG
@@ -120,7 +124,7 @@ void collect_weight(void)
         Serial.println("Inductive not active \n");
         #endif
         drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
-        attempts += 1;
+        attempts++;
       } else {
         drive_step(HOR_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, RIGHT);
         digitalWrite(MAG_PIN, LOW);
@@ -130,7 +134,10 @@ void collect_weight(void)
         #if DEBUG
         Serial.println("Collection complete \n");
         #endif
-//        collection_complete = true;
+        state_change = true;
+        robot_state = NO_WEIGHT;
+        weight_count++;
+        attempts = 0;
       }
     }
     break;

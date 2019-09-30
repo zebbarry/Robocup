@@ -13,6 +13,7 @@
 #include "irposition.h"
 #include "pin_map.h"
 #include "led.h"
+#include "weight_collection.h"
 
 // Local definitions
 bool in_front, to_left, to_right, left_closer, right_closer;
@@ -24,10 +25,20 @@ void navigate(void) {
   Serial.println("Checking directions");
   #endif
 
-  //wall_follow();
-  
-  if (cam_x[0] < 1023) {
-    weight_follow();
+  switch(robot_state) {
+    case NO_WEIGHT:
+      //wall_follow();
+    
+      if (cam_x < 1023) {
+        weight_follow();
+      }
+      break;
+
+    case WEIGHT_AHEAD:
+      wall_follow();
+      
+      motor_speed_l = FORWARD_SLOW;
+      motor_speed_r = FORWARD_SLOW;
   }
 }
 
@@ -126,21 +137,24 @@ void wall_follow(void) {
 
 int calc_weight_error(void) {
   // Calc distance between current weight pos and desired.
-  return DESIRED_POS - cam_x[0];
+  return DESIRED_POS - cam_x;
 }
 
 
 void weight_follow(void) {
   int error = calc_weight_error();
   bool at_max = false;
+  int speed_change, speed_l, speed_r;
 
   if (motor_speed_l >= FORWARD_FULL || motor_speed_l <= BACK_FULL || motor_speed_r >= FORWARD_FULL || motor_speed_r <= BACK_FULL) {
     at_max = true;
   }
 
-  int speed_change = PID_control(error, KP, KI, KD, at_max);
-  int speed_l = PID_HOLD + speed_change;
-  int speed_r = PID_HOLD - speed_change;
+  if (abs(error) > ERROR_MARG) {
+    speed_change = PID_control(error, KP, KI, KD, at_max);
+    speed_l = PID_HOLD + speed_change;
+    speed_r = PID_HOLD - speed_change;
+  }
 
   Serial.print("Calculating PID control (E, L, R): ");
   Serial.print(error);
@@ -175,4 +189,13 @@ int PID_control(int error, float Kp, float Ki, float Kd, bool at_max) {
   int result = P + I + D;
 
   return result;
+}
+
+void check_watchdog(void) {
+  static int counter;
+  counter++;
+  if (counter > MAX_WAIT) {
+    counter = 0;
+    robot_state = NO_WEIGHT;
+  }
 }

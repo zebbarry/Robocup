@@ -38,13 +38,13 @@
 #define IR_READ_TASK_PERIOD                 20
 #define CAM_READ_TASK_PERIOD                100
 #define TOF_READ_TASK_PERIOD                200
-#define IMU_READ_TASK_PERIOD                200
+#define IMU_READ_TASK_PERIOD                100
 #define SENSOR_AVERAGE_PERIOD               100
 #define SET_MOTOR_TASK_PERIOD               100
 #define NAVIGATE_TASK_PERIOD                100
 #define WEIGHT_SCAN_TASK_PERIOD             100
 #define COLLECT_WEIGHT_TASK_PERIOD          100
-#define CHECK_WATCHDOG_TASK_PERIOD          40
+#define CHECK_WATCHDOG_TASK_PERIOD          1000
 #define VICTORY_DANCE_TASK_PERIOD           200
 
 // Task execution amount definitions
@@ -78,11 +78,12 @@ int current_pos;
 int tof_reading;
 float imu_s2s;
 float imu_f2b;
-int cam_x[4];
-int cam_y[4];
+int cam_x;
+int cam_y;
 bool collection_complete;
-bool collection_mode;
 bool state_change;
+int weight_count;
+enum robot_s robot_state;
 
 //**********************************************************************************
 // Task Scheduler and Tasks
@@ -110,7 +111,7 @@ Task tWeight_scan(WEIGHT_SCAN_TASK_PERIOD,       WEIGHT_SCAN_TASK_NUM_EXECUTE,  
 Task tCollect_weight(COLLECT_WEIGHT_TASK_PERIOD, COLLECT_WEIGHT_TASK_NUM_EXECUTE, &collect_weight);
 
 // Tasks to check the 'watchdog' timer (These will need to be added in)
-//Task tCheck_watchdog(CHECK_WATCHDOG_TASK_PERIOD, CHECK_WATCHDOG_TASK_NUM_EXECUTE, &check_watchdog);
+Task tCheck_watchdog(CHECK_WATCHDOG_TASK_PERIOD, CHECK_WATCHDOG_TASK_NUM_EXECUTE, &check_watchdog);
 Task tVictory_dance(VICTORY_DANCE_TASK_PERIOD,   VICTORY_DANCE_TASK_NUM_EXECUTE,  &victory_dance);
 
 Scheduler taskManager;
@@ -138,46 +139,46 @@ void setup() {
 // Set as high or low
 //**********************************************************************************
 void pin_init(){
-    pinMode(IO_POWER, OUTPUT);              //Pin 49 is used to enable IO power
-    digitalWrite(IO_POWER, 1);              //Enable IO power on main CPU board
-
-    // Initialise left and right drive motor pins
-    motor_init(right_motor, RIGHT_MOTOR_PIN);
-    motor_init(left_motor, LEFT_MOTOR_PIN);
-    stepper_init(VER_DIR_PIN, VER_STEP_PIN);
-    stepper_init(HOR_DIR_PIN, HOR_STEP_PIN);
-
-    pinMode(MAG_PIN, OUTPUT);
-    digitalWrite(MAG_PIN, LOW);
-    pinMode(LIMIT_PIN, INPUT);
-    pinMode(CHAN_PIN, INPUT);
-    pinMode(HOR_CALIB, INPUT);
-    pinMode(VER_CALIB, INPUT);
-    
-    sensor_init();
-//    tof_init();
-    imu_init();
-    cam_init();
-//    gantry_init();
-    
-    #if DEBUG
-    Serial.println("Pins have been initialised \n"); 
-    #endif
+  pinMode(IO_POWER, OUTPUT);              //Pin 49 is used to enable IO power
+  digitalWrite(IO_POWER, 1);              //Enable IO power on main CPU board
+  
+  // Initialise left and right drive motor pins
+  motor_init(right_motor, RIGHT_MOTOR_PIN);
+  motor_init(left_motor, LEFT_MOTOR_PIN);
+  stepper_init(VER_DIR_PIN, VER_STEP_PIN);
+  stepper_init(HOR_DIR_PIN, HOR_STEP_PIN);
+  
+  pinMode(MAG_PIN, OUTPUT);
+  digitalWrite(MAG_PIN, LOW);
+  pinMode(LIMIT_PIN, INPUT);
+  pinMode(CHAN_PIN, INPUT);
+  pinMode(HOR_CALIB, INPUT);
+  pinMode(VER_CALIB, INPUT);
+  
+  sensor_init();
+  //    tof_init();
+  imu_init();
+  cam_init();
+  gantry_init();
+  
+  #if DEBUG
+  Serial.println("Pins have been initialised \n"); 
+  #endif
 }
 
 //**********************************************************************************
 // Set default robot state
 //**********************************************************************************
 void robot_init() {
-    #if DEBUG
-    Serial.println("Robot is ready \n");
-    #endif
-    
-    motor_speed_l = STOP_SPEED;
-    motor_speed_r = STOP_SPEED;
-    collection_complete = false;
-    collection_mode = false;
-    state_change = false;
+  #if DEBUG
+  Serial.println("Robot is ready \n");
+  #endif
+  
+  motor_speed_l = STOP_SPEED;
+  motor_speed_r = STOP_SPEED;
+  collection_complete = false;
+  state_change = false;
+  weight_count = 0;
 }
 
 //**********************************************************************************
@@ -187,7 +188,7 @@ void task_init() {
   
   // This is a class/library function. Initialise the task scheduler
   taskManager.init();     
- 
+  
   // Add tasks to the scheduler
   taskManager.addTask(tSend_ultrasonic);   //reading ultrasonic 
   taskManager.addTask(tRead_infrared);
@@ -199,25 +200,25 @@ void task_init() {
   taskManager.addTask(tNavigate);
   taskManager.addTask(tWeight_scan);
   taskManager.addTask(tCollect_weight);
-
-//  taskManager.addTask(tCheck_watchdog);
+  
+  taskManager.addTask(tCheck_watchdog);
   taskManager.addTask(tVictory_dance);      
-
+  
   // Enable the tasks
-//  tSend_ultrasonic.enable();
-//  tRead_infrared.enable();
-//  tRead_tof.enable();
+  //  tSend_ultrasonic.enable();
+  tRead_infrared.enable();
+  //  tRead_tof.enable();
   tRead_cam.enable();
-//  tRead_imu.enable();
-//  tSensor_average.enable();
-//  tSet_motor.enable();
-//  tNavigate.enable();
+  tRead_imu.enable();
+  tSensor_average.enable();
+  //  tSet_motor.enable();
+  tNavigate.enable();
   tWeight_scan.enable();
   tCollect_weight.enable();
-//  tCheck_watchdog.enable();
-//  tVictory_dance.enable();
-
-
+  //  tCheck_watchdog.enable();
+  //  tVictory_dance.enable();
+  
+  
   #if DEBUG 
   Serial.println("Tasks have been initialised \n");
   #endif
@@ -235,25 +236,26 @@ void loop() {
 //    tVictory_dance.disable();
 //  }
 
-//  if (state_change && collection_mode) {
-//    left_motor.writeMicroseconds(STOP_SPEED);
-//    right_motor.writeMicroseconds(STOP_SPEED);
-//    tSet_motor.disable();
-//    tNavigate.disable();
-////    tWeight_scan.enable();
-//    tCollect_weight.enable();
-//    state_change = false;
-//    led_off(BLUE);
-//    led_on(GREEN);
-//  } else if (state_change) {
-//    tSet_motor.enable();
-//    tNavigate.enable();
-////    tWeight_scan.disable();
-//    tCollect_weight.disable();
-//    state_change = false;
-//    led_off(GREEN);
-//    led_on(BLUE);
-//  }
+  if (state_change && robot_state == WEIGHT_FOUND) {
+    left_motor.writeMicroseconds(STOP_SPEED);
+    right_motor.writeMicroseconds(STOP_SPEED);
+    tSet_motor.disable();
+    tNavigate.disable();
+    tCollect_weight.enable();
+    state_change = false;
+    led_set(RED, GREEN, BLUE, LOW, HIGH, LOW);
+  } else if (state_change && robot_state == NO_WEIGHT) {
+    tSet_motor.enable();
+    tNavigate.enable();
+    tCollect_weight.disable();
+    state_change = false;
+    led_set(RED, GREEN, BLUE, LOW, LOW, HIGH);
+  } else if (state_change && robot_state == WEIGHT_AHEAD) {
+    tCollect_weight.enable();
+    tCheck_watchdog.enable();
+    state_change = false;
+    led_set(RED, GREEN, BLUE, HIGH, LOW, LOW);
+  }
   
   taskManager.execute();    //execute the scheduler
 }

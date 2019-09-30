@@ -60,8 +60,8 @@ void read_tof(void) {
 void read_imu(void) {
   sEul_t imu_eul = read_imu_eul();
   
-  imu_s2s = imu_eul.pitch;
-  imu_f2b = imu_eul.roll;
+  imu_s2s = imu_eul.pitch;  // Tilt to right is +ve
+  imu_f2b = imu_eul.roll;   // Tilt forwards is +ve
   
   #if DEBUG
   Serial.print("Reading IMU sensor (P, R): ");
@@ -168,19 +168,4 @@ void sensor_average(void){
   Serial.print(" ");
   Serial.println(ir_averages.right);
   #endif
-  
-   static int limit_1, limit_2, limit_3;
-  
-   limit_3 = limit_2;
-   limit_2 = limit_1;
-   limit_1 = !digitalRead(LIMIT_PIN);
-   
-   if (!limit_3 && !limit_2 && limit_1) {
-    #if DEBUG
-    Serial.println("Changing mode -----------------");
-    Serial.println(collection_mode);
-    #endif
-    collection_mode = !collection_mode;
-    state_change = true;
-   }
 }

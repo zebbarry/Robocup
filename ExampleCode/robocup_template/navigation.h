@@ -16,10 +16,12 @@
 #define BACK_FULL    1200
 #define BACK_SLOW    1300
 #define DESIRED_POS  1023 / 2
+#define ERROR_MARG   50
 #define KP           0.8
 #define KI           0
 #define KD           0
 #define PID_HOLD     STOP_SPEED
+#define MAX_WAIT     5
 
 
 // Navigation sequence
@@ -32,5 +34,7 @@ void weight_follow(void);
 int calc_weight_error(void);
 
 int PID_control(int error, float Kp, float Ki, float Kd, bool at_max);
+
+void check_watchdog(void);
 
 #endif /* NAVIGATION_H_ */

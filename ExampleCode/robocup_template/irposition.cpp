@@ -49,7 +49,6 @@ void cam_init(void)
 
 void read_cam(void)
 {
-  int start_t = millis();
   //IR sensor read
   Wire.beginTransmission(slaveAddress);
   Wire.write(0x36);
@@ -66,44 +65,18 @@ void read_cam(void)
   }
 
   //Manipulate data received into useable format
-  cam_x[0] = data_buf[1];
-  cam_y[0] = data_buf[2];
+  cam_x = data_buf[1];
+  cam_y = data_buf[2];
   s   = data_buf[3];
-  cam_x[0] += (s & 0x30) << 4;
-  cam_y[0] += (s & 0xC0) << 2;
+  cam_x += (s & 0x30) << 4;
+  cam_y += (s & 0xC0) << 2;
 
-  cam_x[1] = data_buf[4];
-  cam_y[1] = data_buf[5];
-  s   = data_buf[6];
-  cam_x[1] += (s & 0x30) << 4;
-  cam_y[1] += (s & 0xC0) << 2;
-
-  cam_x[2] = data_buf[7];
-  cam_y[2] = data_buf[8];
-  s   = data_buf[9];
-  cam_x[2] += (s & 0x30) << 4;
-  cam_y[2] += (s & 0xC0) << 2;
-
-  cam_x[3] = data_buf[10];
-  cam_y[3] = data_buf[11];
-  s   = data_buf[12];
-  cam_x[3] += (s & 0x30) << 4;
-  cam_y[3] += (s & 0xC0) << 2;
 
   #if DEBUG
   Serial.print("Reading ir positioning camera: ");
-  
-  //Display data on the serial port
-  for (i = 0; i < num_coords; i++)
-  {
-    Serial.print( int(cam_x[i]) );
-    Serial.print(",");
-    Serial.print( int(cam_y[i]) );
-    if (i < num_coords - 1)
-      Serial.print(",");
-  }
+  Serial.print( int(cam_x) );
+  Serial.print(",");
+  Serial.print( int(cam_y) );
   Serial.println("");
   #endif
-  int end_t = millis();
-  Serial.println(end_t-start_t);
 }
