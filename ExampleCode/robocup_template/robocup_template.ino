@@ -178,6 +178,7 @@ void robot_init() {
   motor_speed_r = STOP_SPEED;
   collection_complete = false;
   state_change = false;
+  robot_state = NO_WEIGHT;
   weight_count = 0;
 }
 

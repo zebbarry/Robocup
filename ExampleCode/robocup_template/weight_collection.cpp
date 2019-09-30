@@ -27,10 +27,13 @@ void gantry_init(void)
   int start_t, current_t;
   hor_trig = false;
   ver_trig = false;
+  Q1 = true;
+  Q2 = true;
+  Q3 = true;
   start_t = millis();
   
   while(!hor_trig && current_t - start_t < MAX_TIME) {
-    drive_step(CALIB_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, LEFT);
+//    drive_step(CALIB_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, LEFT);
     
     Q3 = Q2;
     Q2 = Q1;
@@ -39,13 +42,22 @@ void gantry_init(void)
       hor_trig = true;
     }    
     current_t = millis();
+    Serial.println(Q1);
   }
   
   drive_step(HOR_RETURN, HOR_STEP_PIN, HOR_DIR_PIN, RIGHT);
   
   #if DEBUG
-  Serial.println("Horizontal stepper initialised");
+  if (hor_trig) {
+    Serial.println("Horizontal stepper initialised");
+  } else {
+    Serial.println("Max time reached");
+  }
   #endif
+  
+  Q1 = true;
+  Q2 = true;
+  Q3 = true;
   
   while(!ver_trig && current_t - start_t < MAX_TIME) {
     drive_step(CALIB_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
