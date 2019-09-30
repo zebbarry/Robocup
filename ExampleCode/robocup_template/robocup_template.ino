@@ -212,8 +212,8 @@ void task_init() {
 //  tSensor_average.enable();
 //  tSet_motor.enable();
 //  tNavigate.enable();
-//  tWeight_scan.enable();
-//  tCollect_weight.enable();
+  tWeight_scan.enable();
+  tCollect_weight.enable();
 //  tCheck_watchdog.enable();
 //  tVictory_dance.enable();
 

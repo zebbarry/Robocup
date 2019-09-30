@@ -88,8 +88,6 @@ void weight_scan(void)
     collection_mode = true;
     state_change = true;
   } else if (weight_state == WEIGHT_FOUND){
-    left_motor.writeMicroseconds(MAX_SPEED);
-    right_motor.writeMicroseconds(MAX_SPEED);
     collection_mode = false;
     state_change = true;
     attempts = 0;
@@ -112,8 +110,8 @@ void collect_weight(void)
       
       digitalWrite(MAG_PIN, HIGH);
       delay(500);
-      drive_step(150, VER_STEP_PIN, VER_DIR_PIN, DOWN);
-      drive_step(150, VER_STEP_PIN, VER_DIR_PIN, UP);
+      drive_step(100, VER_STEP_PIN, VER_DIR_PIN, DOWN);
+      drive_step(100, VER_STEP_PIN, VER_DIR_PIN, UP);
       drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, UP);
       induct_state = digitalRead(INDUCTIVE_PIN);
       
