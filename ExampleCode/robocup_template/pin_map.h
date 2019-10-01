@@ -95,10 +95,10 @@
 #define BLUE                DI7
 #define US_TRIG_PIN         A4 // Wrong
 #define LIMIT_PIN           DO4
-#define MAG_PIN             DI3
+#define MAG_PIN             DI1
 #define FAN_PIN             DI7 // Wrong
 #define CHAN_PIN            DI4
-#define VER_CALIB           DI1
+#define VER_CALIB           DI3
 #define HOR_CALIB           DI2
 
 // Stepper Pins

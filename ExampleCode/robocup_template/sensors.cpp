@@ -160,12 +160,12 @@ void sensor_average(void){
   average = average_buf(&ir_array.front);
   ir_averages.front = convert_ir_dist(average, SHORT);
   
-  #if DEBUG
+//  #if DEBUG
   Serial.print("Averaging the sensors (L, F, R) ");
   Serial.print(ir_averages.left);
   Serial.print(" ");
   Serial.print(ir_averages.front);
   Serial.print(" ");
   Serial.println(ir_averages.right);
-  #endif
+//  #endif
 }

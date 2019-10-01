@@ -1,14 +1,14 @@
 /*
 Test out the limit switches on the IO extension board
 */
-int PinLimit01 = 45;
+int PinLimit01 = 42;
 
 void setup()
 {
   pinMode(49, OUTPUT);                 //Pin 49 is used to enable IO power
   digitalWrite(49, 1);                 //Enable IO power on main CPU board
  
-  pinMode(PinLimit01,INPUT);  //Define all the pins as inputs
+  pinMode(PinLimit01,INPUT_PULLUP);  //Define all the pins as inputs
   
   Serial.begin(9600);        //Set up serial communications
 }

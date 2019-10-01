@@ -9,7 +9,6 @@
 #define LEFT_LIMIT  200 // mm
 #define RIGHT_LIMIT 200
 #define FRONT_LIMIT 150
-#define DESIRED_LIM 300
 #define STEP        150
 #define FORWARD_FULL 2000
 #define FORWARD_SLOW 1700
@@ -22,6 +21,7 @@
 #define KD           0.005
 #define PID_HOLD     STOP_SPEED
 #define MAX_WAIT     5
+#define BLOCKED_DELAY 100
 
 
 // Navigation sequence

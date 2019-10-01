@@ -10,7 +10,6 @@
 #define WEIGHT_COLLECTION_H_
 
 #include <Servo.h>                  //control the DC motors
-#include <Herkulex.h>               //smart servo
 #include <Wire.h>                   //for I2C and SPI
 
 

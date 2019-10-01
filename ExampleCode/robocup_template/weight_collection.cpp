@@ -31,6 +31,7 @@ void gantry_init(void)
   Q2 = true;
   Q3 = true;
   start_t = millis();
+  current_t = start_t + 1;  // To initialize
   
   while(!hor_trig && current_t - start_t < MAX_TIME) {
     drive_step(CALIB_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, LEFT);

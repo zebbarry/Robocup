@@ -13,13 +13,10 @@
 #include "irposition.h"
 #include "pin_map.h"
 #include "led.h"
-#include "weight_collection.h"
 
 // Local definitions
 bool in_front, to_left, to_right, left_closer, right_closer;
 int32_t error_int, error_prev;
-
-#define DEBUG 1
 
 // Navigation sequence
 void navigate(void) {
@@ -68,8 +65,9 @@ void navigate(void) {
 
 bool obstacle_avoid(void) {
   // Checks all direction avoiding obstacles if neccessary, returns false if no obstacles found.
-  
   bool obstacle_present = true;
+  static int blocked_front = 0;
+  
   if (in_front) {    // Object in front
     #if DEBUG
     Serial.println("Object in front");
@@ -77,58 +75,91 @@ bool obstacle_avoid(void) {
     
     if (to_left && to_right) { // Object in front and left and right
       #if DEBUG
-      Serial.println("Cornered \n");
+      Serial.println("Cornered, reversing\n");
       #endif
       // Back up and turn around
       motor_speed_l = BACK_SLOW;
       motor_speed_r = BACK_SLOW;
+      blocked_front = BLOCKED_DELAY;
       
     } else if (left_closer) {   // Object in front and closer to the left
       #if DEBUG
-      Serial.println("Object also closer to the left");
+      Serial.println("Object also closer to the left, spinning right");
       #endif
       // Turn right
       motor_speed_l = FORWARD_SLOW;
       motor_speed_r = BACK_SLOW;
+      blocked_front = 0;
       
     } else {  // Object to right
       #if DEBUG
-      Serial.println("Object also closer to the right \n");
+      Serial.println("Object also closer to the right, spinning left \n");
       #endif
       // Turn left
       motor_speed_l = BACK_SLOW;
       motor_speed_r = FORWARD_SLOW;
+      blocked_front = 0;
     }
   } else {
     if (to_left && to_right) { // Cornered
-      #if DEBUG
-      Serial.println("Cornered with nothing in front \n");
-      #endif
-      // Turn around
-      motor_speed_l = FORWARD_SLOW;
-      motor_speed_r = FORWARD_SLOW;
-       
+      if (blocked_front) {
+        #if DEBUG
+        Serial.println("Obstacles left, right and previously in front. \n");
+        #endif
+        blocked_front--;
+
+        if (left_closer) {
+          #if DEBUG
+          Serial.println("Left object closer, spinning right");
+          #endif
+          // Turn right
+          motor_speed_l = FORWARD_SLOW;
+          motor_speed_r = BACK_SLOW;
+          blocked_front = 0;
+          
+        } else {
+          #if DEBUG
+          Serial.println("Right object closer, spinning left");
+          #endif
+          // Turn lwft
+          motor_speed_l = BACK_SLOW;
+          motor_speed_r = FORWARD_SLOW;
+          blocked_front = 0;
+        }
+        
+      } else {
+        #if DEBUG
+        Serial.println("Obstacles left and right, driving forward slowly \n");
+        #endif
+        // Turn around
+        motor_speed_l = FORWARD_SLOW;
+        motor_speed_r = FORWARD_SLOW;
+      }
+      
     } else if (to_left) { // Wall to left
       #if DEBUG
-      Serial.println("Object to the left \n");
+      Serial.println("Object to the left, turning right gradually \n");
       #endif
       // Turn right a little bit
       motor_speed_l = FORWARD_SLOW;
       motor_speed_r = STOP_SPEED;
+      blocked_front = 0;
       
     } else if (to_right) {
       #if DEBUG
-      Serial.println("Object to the right \n");
+      Serial.println("Object to the right, turning left gradually \n");
       #endif
       // Turn left a little bit
       motor_speed_l = STOP_SPEED;
       motor_speed_r = FORWARD_SLOW;
+      blocked_front = 0;
       
     } else {
       #if DEBUG
       Serial.println("No walls too close");
       #endif
       obstacle_present = false;
+      blocked_front = 0;
     }
   }
 
@@ -174,6 +205,7 @@ void weight_follow(void) {
   int error = calc_weight_error();
   bool at_max = false;
   int speed_change, speed_l, speed_r;
+  
   speed_l = PID_HOLD;
   speed_r = PID_HOLD;
 
