@@ -36,13 +36,13 @@
 // ALL OF THESE VALUES WILL NEED TO BE SET TO SOMETHING USEFUL !!!!!!!!!!!!!!!!!!!!
 #define US_SEND_TASK_PERIOD                 500
 #define IR_READ_TASK_PERIOD                 20
-#define CAM_READ_TASK_PERIOD                100
-#define TOF_READ_TASK_PERIOD                200
-#define IMU_READ_TASK_PERIOD                100
-#define SENSOR_AVERAGE_PERIOD               100
-#define SET_MOTOR_TASK_PERIOD               100
-#define NAVIGATE_TASK_PERIOD                100
-#define WEIGHT_SCAN_TASK_PERIOD             100
+#define CAM_READ_TASK_PERIOD                50
+#define TOF_READ_TASK_PERIOD                100
+#define IMU_READ_TASK_PERIOD                50
+#define SENSOR_AVERAGE_PERIOD               50
+#define SET_MOTOR_TASK_PERIOD               50
+#define NAVIGATE_TASK_PERIOD                50
+#define WEIGHT_SCAN_TASK_PERIOD             50
 #define COLLECT_WEIGHT_TASK_PERIOD          100
 #define CHECK_WATCHDOG_TASK_PERIOD          1000
 #define VICTORY_DANCE_TASK_PERIOD           200
@@ -177,7 +177,7 @@ void robot_init() {
   motor_speed_l = STOP_SPEED;
   motor_speed_r = STOP_SPEED;
   collection_complete = false;
-  state_change = false;
+  state_change = true;
   robot_state = NO_WEIGHT;
   weight_count = 0;
 }
@@ -205,19 +205,19 @@ void task_init() {
   taskManager.addTask(tCheck_watchdog);
   taskManager.addTask(tVictory_dance);      
   
-  // Enable the tasks
-  //  tSend_ultrasonic.enable();
+// Enable the tasks
+//  tSend_ultrasonic.enable();
   tRead_infrared.enable();
-  //  tRead_tof.enable();
+//  tRead_tof.enable();
   tRead_cam.enable();
   tRead_imu.enable();
   tSensor_average.enable();
-  //  tSet_motor.enable();
+  tSet_motor.enable();
   tNavigate.enable();
   tWeight_scan.enable();
   tCollect_weight.enable();
-  //  tCheck_watchdog.enable();
-  //  tVictory_dance.enable();
+  tCheck_watchdog.enable();
+//  tVictory_dance.enable();
   
   
   #if DEBUG 
@@ -238,25 +238,21 @@ void loop() {
 //  }
 
   if (state_change && robot_state == WEIGHT_FOUND) {
-    left_motor.writeMicroseconds(STOP_SPEED);
-    right_motor.writeMicroseconds(STOP_SPEED);
-    tSet_motor.disable();
-    tNavigate.disable();
     tCollect_weight.enable();
+    tCheck_watchdog.disable();
     state_change = false;
-    led_set(RED, GREEN, BLUE, LOW, HIGH, LOW);
+    led_set(RED, GREEN, BLUE, LOW, HIGH, LOW);  // Turn on Green
   } else if (state_change && robot_state == NO_WEIGHT) {
-    tSet_motor.enable();
-    tNavigate.enable();
     tCollect_weight.disable();
+    tCheck_watchdog.disable();
     state_change = false;
-    led_set(RED, GREEN, BLUE, LOW, LOW, HIGH);
+    led_set(RED, GREEN, BLUE, LOW, LOW, HIGH);  // Turn on Blue
   } else if (state_change && robot_state == WEIGHT_AHEAD) {
     tCollect_weight.enable();
     tCheck_watchdog.enable();
     state_change = false;
-    led_set(RED, GREEN, BLUE, HIGH, LOW, LOW);
+    led_set(RED, GREEN, BLUE, HIGH, LOW, LOW);  // Turn on Red
   }
   
-  taskManager.execute();    //execute the scheduler
+  taskManager.execute();    // Execute the scheduler
 }

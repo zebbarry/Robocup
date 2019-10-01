@@ -16,16 +16,18 @@
 #define BACK_FULL    1200
 #define BACK_SLOW    1300
 #define DESIRED_POS  1023 / 2
-#define ERROR_MARG   50
-#define KP           0.8
+#define ERROR_MARG   125
+#define KP           0.6
 #define KI           0
-#define KD           0
+#define KD           0.005
 #define PID_HOLD     STOP_SPEED
 #define MAX_WAIT     5
 
 
 // Navigation sequence
 void navigate(void);
+
+bool obstacle_avoid(void);
 
 void wall_follow(void);
 

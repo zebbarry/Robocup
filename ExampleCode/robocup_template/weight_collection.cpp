@@ -33,7 +33,7 @@ void gantry_init(void)
   start_t = millis();
   
   while(!hor_trig && current_t - start_t < MAX_TIME) {
-//    drive_step(CALIB_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, LEFT);
+    drive_step(CALIB_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, LEFT);
     
     Q3 = Q2;
     Q2 = Q1;
@@ -42,7 +42,6 @@ void gantry_init(void)
       hor_trig = true;
     }    
     current_t = millis();
-    Serial.println(Q1);
   }
   
   drive_step(HOR_RETURN, HOR_STEP_PIN, HOR_DIR_PIN, RIGHT);
@@ -88,26 +87,47 @@ void weight_scan(void)
   Serial.println("Looking for weights \n");
   #endif
 
-  int weight_in_channel = !digitalRead(CHAN_PIN);
+  bool failed_state = false;
+  int weight_in_channel, induct_state, delay_start, delay_current;
+  
+  weight_in_channel = !digitalRead(CHAN_PIN);
   if (weight_in_channel) {
-    robot_state = WEIGHT_AHEAD;
-    left_motor.writeMicroseconds(STOP_SPEED);
-    right_motor.writeMicroseconds(STOP_SPEED);
+    #if DEBUG
+    Serial.println("Weight in channel! \n");
+    #endif
+    if (robot_state != WEIGHT_AHEAD) {
+      robot_state = WEIGHT_AHEAD;
+      state_change = true;
+      left_motor.writeMicroseconds(STOP_SPEED);
+      right_motor.writeMicroseconds(STOP_SPEED);
+    }
   }
   
-  int induct_state = digitalRead(INDUCTIVE_PIN);
-  if (induct_state && attempts < MAX_ATTEMPTS) {
+  induct_state = digitalRead(INDUCTIVE_PIN);
+  if (induct_state && attempts < MAX_ATTEMPTS && !failed_state) {
     #if DEBUG
     Serial.println("Inductive Active \n");
     #endif
-    left_motor.writeMicroseconds(STOP_SPEED);
-    right_motor.writeMicroseconds(STOP_SPEED);
-    robot_state = WEIGHT_FOUND;
-    state_change = true;
+
+    if (robot_state != WEIGHT_FOUND) {
+      left_motor.writeMicroseconds(STOP_SPEED);
+      right_motor.writeMicroseconds(STOP_SPEED);
+      robot_state = WEIGHT_FOUND;
+      state_change = true;
+    }
+    
   } else if (robot_state == WEIGHT_FOUND){
     state_change = true;
+    failed_state = true;
+    delay_start = millis();
     robot_state = NO_WEIGHT;
     attempts = 0;
+    
+  } else if (failed_state) {
+    delay_current = millis();
+    if (delay_current - delay_start > FAILED_DELAY) {
+      failed_state = false;
+    }
   }
 }
 
@@ -119,44 +139,48 @@ void collect_weight(void)
   
   switch (robot_state) {
     case WEIGHT_FOUND:
-    if (!collection_complete) {
-      #if DEBUG
-      Serial.println("Collecting weight \n");
-      #endif
-      
-      digitalWrite(MAG_PIN, HIGH);
-      delay(500);
-      drive_step(100, VER_STEP_PIN, VER_DIR_PIN, DOWN);
-      drive_step(100, VER_STEP_PIN, VER_DIR_PIN, UP);
-      drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, UP);
-      induct_state = digitalRead(INDUCTIVE_PIN);
-      
-      if (!induct_state) {
+      if (!collection_complete) {
         #if DEBUG
-        Serial.println("Inductive not active \n");
+        Serial.println("Collecting weight \n");
         #endif
-        drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
-        attempts++;
-      } else {
-        drive_step(HOR_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, RIGHT);
-        digitalWrite(MAG_PIN, LOW);
-        drive_step(HOR_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, LEFT);
-        drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
         
-        #if DEBUG
-        Serial.println("Collection complete \n");
-        #endif
-        state_change = true;
-        robot_state = NO_WEIGHT;
-        weight_count++;
-        attempts = 0;
+        digitalWrite(MAG_PIN, HIGH);
+        delay(500);
+        drive_step(100, VER_STEP_PIN, VER_DIR_PIN, DOWN);
+        drive_step(100, VER_STEP_PIN, VER_DIR_PIN, UP);
+        drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, UP);
+        induct_state = digitalRead(INDUCTIVE_PIN);
+        
+        if (!induct_state) {  // Pickup unsuccessful
+          #if DEBUG
+          Serial.println("Inductive not active \n");
+          #endif
+          drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
+          attempts++;
+          
+        } else {  // Pickup successful
+          drive_step(HOR_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, RIGHT);
+          digitalWrite(MAG_PIN, LOW);
+          drive_step(HOR_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, LEFT);
+          drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
+          
+          #if DEBUG
+          Serial.println("Collection complete \n");
+          #endif
+          state_change = true;
+          robot_state = NO_WEIGHT;
+          weight_count++;
+          if (weight_count >= 2) {
+            collection_complete = true;
+          }
+          attempts = 0;
+        }
       }
-    }
-    break;
+      break;
 
-    case NO_WEIGHT:
-    digitalWrite(MAG_PIN, LOW);
-    break;
+    default:
+      digitalWrite(MAG_PIN, LOW);
+      break;
   }
 }
 

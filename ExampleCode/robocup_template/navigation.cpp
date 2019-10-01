@@ -19,38 +19,57 @@
 bool in_front, to_left, to_right, left_closer, right_closer;
 int32_t error_int, error_prev;
 
+#define DEBUG 1
+
 // Navigation sequence
 void navigate(void) {
-  #if DEBUG
-  Serial.println("Checking directions");
-  #endif
+//  #if DEBUG
+//  Serial.println("Running navigation");
+//  #endif
+  bool obstacle_present = false;
 
-  switch(robot_state) {
-    case NO_WEIGHT:
-      //wall_follow();
-    
-      if (cam_x < 1023) {
-        weight_follow();
-      }
-      break;
-
-    case WEIGHT_AHEAD:
-      wall_follow();
-      
-      motor_speed_l = FORWARD_SLOW;
-      motor_speed_r = FORWARD_SLOW;
-  }
-}
-
-
-void wall_follow(void) {
   in_front     = ir_averages.front <= FRONT_LIMIT;
   to_left      = ir_averages.left  <= LEFT_LIMIT;
   to_right     = ir_averages.right <= RIGHT_LIMIT;
   left_closer  = ir_averages.left   < ir_averages.right;
   right_closer = ir_averages.left   > ir_averages.right;
+
+  switch(robot_state) {
+    case NO_WEIGHT:
+      obstacle_present = obstacle_avoid();
+
+      if (!obstacle_present) {
+//        if (cam_x < 1023) {
+//          weight_follow();
+//        } else {
+          wall_follow();
+//          motor_speed_l = STOP_SPEED;
+//          motor_speed_r = STOP_SPEED;
+//        }
+      }
+      break;
+
+    case WEIGHT_AHEAD:
+      obstacle_present = obstacle_avoid();
+
+      if (!obstacle_present) {
+        motor_speed_l = FORWARD_SLOW;
+        motor_speed_r = FORWARD_SLOW;
+      }
+      break;
+
+    case WEIGHT_FOUND:
+      motor_speed_l = STOP_SPEED;
+      motor_speed_r = STOP_SPEED;
+      break;
+  }
+}
+
+
+bool obstacle_avoid(void) {
+  // Checks all direction avoiding obstacles if neccessary, returns false if no obstacles found.
   
-  
+  bool obstacle_present = true;
   if (in_front) {    // Object in front
     #if DEBUG
     Serial.println("Object in front");
@@ -80,7 +99,6 @@ void wall_follow(void) {
       motor_speed_l = BACK_SLOW;
       motor_speed_r = FORWARD_SLOW;
     }
-    
   } else {
     if (to_left && to_right) { // Cornered
       #if DEBUG
@@ -105,32 +123,43 @@ void wall_follow(void) {
       // Turn left a little bit
       motor_speed_l = STOP_SPEED;
       motor_speed_r = FORWARD_SLOW;
+      
     } else {
       #if DEBUG
       Serial.println("No walls too close");
       #endif
-      
-      if (left_closer) { // Closer to the left
-        #if DEBUG
-        Serial.println("Closer to the left \n");
-        #endif
-        motor_speed_l = FORWARD_FULL - STEP;
-        motor_speed_r = FORWARD_FULL;
-        
-      } else if (right_closer) {
-        #if DEBUG
-        Serial.println("Closer to the right \n");
-        #endif
-        motor_speed_l = FORWARD_FULL;
-        motor_speed_r = FORWARD_FULL - STEP;
-      } else {
-        #if DEBUG
-        Serial.println("No walls in sight \n");
-        #endif
-        motor_speed_l = FORWARD_FULL;
-        motor_speed_r = FORWARD_FULL;
-      }
+      obstacle_present = false;
     }
+  }
+
+  return obstacle_present;
+}
+
+
+void wall_follow(void) {
+  #if DEBUG
+  Serial.println("Following walls \n");
+  #endif
+  
+  if (left_closer) { // Closer to the left
+    #if DEBUG
+    Serial.println("Closer to the left \n");
+    #endif
+    motor_speed_l = FORWARD_FULL - STEP;
+    motor_speed_r = FORWARD_FULL;
+    
+  } else if (right_closer) {
+    #if DEBUG
+    Serial.println("Closer to the right \n");
+    #endif
+    motor_speed_l = FORWARD_FULL;
+    motor_speed_r = FORWARD_FULL - STEP;
+  } else {
+    #if DEBUG
+    Serial.println("No walls in sight \n");
+    #endif
+    motor_speed_l = FORWARD_FULL;
+    motor_speed_r = FORWARD_FULL;
   }
 }
 
@@ -145,6 +174,8 @@ void weight_follow(void) {
   int error = calc_weight_error();
   bool at_max = false;
   int speed_change, speed_l, speed_r;
+  speed_l = PID_HOLD;
+  speed_r = PID_HOLD;
 
   if (motor_speed_l >= FORWARD_FULL || motor_speed_l <= BACK_FULL || motor_speed_r >= FORWARD_FULL || motor_speed_r <= BACK_FULL) {
     at_max = true;
@@ -152,16 +183,21 @@ void weight_follow(void) {
 
   if (abs(error) > ERROR_MARG) {
     speed_change = PID_control(error, KP, KI, KD, at_max);
-    speed_l = PID_HOLD + speed_change;
-    speed_r = PID_HOLD - speed_change;
+    speed_l = speed_l - speed_change;
+    speed_r = speed_r + speed_change;
   }
 
+  motor_speed_l = speed_l;
+  motor_speed_r = speed_r;
+
+  #if DEBUG
   Serial.print("Calculating PID control (E, L, R): ");
   Serial.print(error);
   Serial.print(",");
   Serial.print(speed_l);
   Serial.print(",");
   Serial.println(speed_r);
+  #endif
 }
 
 
@@ -193,9 +229,11 @@ int PID_control(int error, float Kp, float Ki, float Kd, bool at_max) {
 
 void check_watchdog(void) {
   static int counter;
-  counter++;
-  if (counter > MAX_WAIT) {
-    counter = 0;
-    robot_state = NO_WEIGHT;
+  if (robot_state == WEIGHT_AHEAD) {
+    counter++;
+    if (counter > MAX_WAIT) {
+      counter = 0;
+      robot_state = NO_WEIGHT;
+    }
   }
 }

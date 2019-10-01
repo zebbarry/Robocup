@@ -35,19 +35,30 @@ BNO::eStatus_t imu_init(void) {
   #if DEBUG
   Serial.println("Initialise IMU sensor \n");
   #endif
-  
+
+
+  BNO::eStatus_t result;
+  int count = 0;
   bno.reset();
-  BNO::eStatus_t result = bno.begin();
   
-  #if DEBUG
-  if (result != BNO::eStatusOK) {
-    Serial.println("BNO begin failed");
-    printLastOperateStatus(bno.lastOperateStatus);
-  } else {
-    Serial.println("BNO begin success");
-  }
-  Serial.println("");
-  #endif
+  do {
+    result = bno.begin();
+    count++;
+  
+    #if DEBUG
+    if (result != BNO::eStatusOK) {
+      Serial.println("BNO begin failed");
+      printLastOperateStatus(bno.lastOperateStatus);
+    } else {
+      Serial.println("BNO begin success");
+    }
+    #endif
+
+    if (result != BNO::eStatusOK) {
+      delay(500);
+    }
+    
+  } while (result != BNO::eStatusOK && count < MAX_INIT_COUNT);
 
   return result;
 }

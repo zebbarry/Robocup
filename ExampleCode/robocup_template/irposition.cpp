@@ -40,9 +40,22 @@ void cam_init(void)
   // IR sensor initialize
   Write_2bytes(0x30, 0x01); delay(10);
   Write_2bytes(0x30, 0x08); delay(10);
+  
+  // Set sensitivity block 1
+  Write_2bytes(0x01, 0x00); delay(10);
+  Write_2bytes(0x02, 0x00); delay(10);
+  Write_2bytes(0x03, 0x00); delay(10);
+  Write_2bytes(0x04, 0x00); delay(10);
+  Write_2bytes(0x05, 0x00); delay(10);
   Write_2bytes(0x06, 0x90); delay(10);
+  Write_2bytes(0x07, 0x00); delay(10);
   Write_2bytes(0x08, 0xC0); delay(10);
+  
+  // Set sensitivity block 2
   Write_2bytes(0x1A, 0x40); delay(10);
+  Write_2bytes(0x1B, 0x00); delay(10);
+
+  // Write mode number
   Write_2bytes(0x33, 0x33); delay(10);
   delay(100);
 }

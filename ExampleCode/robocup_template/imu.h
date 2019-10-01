@@ -9,6 +9,7 @@
 #include "DFRobot_BNO055.h"
 #include "Wire.h"
 
+#define MAX_INIT_COUNT  3
 #define printAxisData(sAxis) \
   Serial.print(" x: "); \
   Serial.print(sAxis.x); \
