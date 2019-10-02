@@ -15,7 +15,7 @@
 #include <Servo.h>                  //control the DC motors
 //#include <Herkulex.h>             //smart servo
 #include <Wire.h>                   //for I2C and SPI
-#include "TaskScheduler\src\TaskScheduler.h"          //scheduler 
+#include <TaskScheduler.h>       //scheduler 
 
 // Custom headers
 #include "motors.h"
@@ -80,7 +80,6 @@ float imu_s2s;
 float imu_f2b;
 int cam_x;
 int cam_y;
-bool collection_complete;
 bool state_change;
 int weight_count;
 enum robot_s robot_state;
@@ -176,7 +175,6 @@ void robot_init() {
   
   motor_speed_l = STOP_SPEED;
   motor_speed_r = STOP_SPEED;
-  collection_complete = false;
   state_change = true;
   robot_state = NO_WEIGHT;
   weight_count = 0;
@@ -231,27 +229,30 @@ void task_init() {
 // put your main code here, to run repeatedly
 //**********************************************************************************
 void loop() {
-//  if (collection_complete) {
-//    tVictory_dance.enable();
-//  } else {
-//    tVictory_dance.disable();
-//  }
-
+  
   if (state_change && robot_state == WEIGHT_FOUND) {
     tCollect_weight.enable();
     tCheck_watchdog.disable();
     state_change = false;
-    led_set(RED, GREEN, BLUE, LOW, HIGH, LOW);  // Turn on Green
+    led_set(RED, GREEN, BLUE, false, true, false);  // Turn on Green
   } else if (state_change && robot_state == NO_WEIGHT) {
     tCollect_weight.disable();
     tCheck_watchdog.disable();
     state_change = false;
-    led_set(RED, GREEN, BLUE, LOW, LOW, HIGH);  // Turn on Blue
+    led_set(RED, GREEN, BLUE, false, false, true);  // Turn on Blue
   } else if (state_change && robot_state == WEIGHT_AHEAD) {
     tCollect_weight.enable();
     tCheck_watchdog.enable();
     state_change = false;
-    led_set(RED, GREEN, BLUE, HIGH, LOW, LOW);  // Turn on Red
+    led_set(RED, GREEN, BLUE, true, false, false);  // Turn on Red
+  } else if (robot_state == COMP_OVER) {
+    if (state_change) {
+      tWeight_scan.disable();
+      tCollect_weight.disable();
+      tCheck_watchdog.disable();
+      led_set(RED, GREEN, BLUE, false, false, false);  // Turn on Red
+    }
+    led_toggle(GREEN);
   }
   
   taskManager.execute();    // Execute the scheduler

@@ -38,8 +38,10 @@ void navigate(void) {
 
       if (!obstacle_present) {
         if (cam_x < 1023) {
+          led_toggle(BLUE);
           weight_follow();
         } else {
+          led_on(BLUE);
           wall_follow();
         }
       }
@@ -49,12 +51,17 @@ void navigate(void) {
       obstacle_present = obstacle_avoid();
 
       if (!obstacle_present) {
-        motor_speed_l = FORWARD_SLOW;
-        motor_speed_r = FORWARD_SLOW;
+        motor_speed_l = APPROACHING;
+        motor_speed_r = APPROACHING;
       }
       break;
 
     case WEIGHT_FOUND:
+      motor_speed_l = STOP_SPEED;
+      motor_speed_r = STOP_SPEED;
+      break;
+
+    case COMP_OVER:
       motor_speed_l = STOP_SPEED;
       motor_speed_r = STOP_SPEED;
       break;
@@ -139,24 +146,27 @@ bool obstacle_avoid(void) {
         #if DEBUG
         Serial.println("Obstacles left, right and previously in front. \n");
         #endif
+        
+        if (blocked_front == BLOCKED_DELAY) {   // Pick a direction and keep turning that way
+          if (left_closer) {
+            #if DEBUG
+            Serial.println("Forced turning, spinning right");
+            #endif
+            // Turn right
+            motor_speed_l = FORWARD_SLOW;
+            motor_speed_r = BACK_SLOW;
+            
+          } else {
+            #if DEBUG
+            Serial.println("Right object closer, spinning left");
+            #endif
+            // Turn lwft
+            motor_speed_l = BACK_SLOW;
+            motor_speed_r = FORWARD_SLOW;
+          }
+        }
+        
         blocked_front--;
-
-//        if (left_closer) {
-          #if DEBUG
-          Serial.println("Forced turning, spinning right");
-          #endif
-          // Turn right
-          motor_speed_l = FORWARD_SLOW;
-          motor_speed_r = BACK_SLOW;
-          
-//        } else {
-//          #if DEBUG
-//          Serial.println("Right object closer, spinning left");
-//          #endif
-//          // Turn lwft
-//          motor_speed_l = BACK_SLOW;
-//          motor_speed_r = FORWARD_SLOW;
-//        }
         
       } else {
         #if DEBUG
@@ -174,7 +184,7 @@ bool obstacle_avoid(void) {
       #endif
       // Turn right a little bit
       motor_speed_l = FORWARD_SLOW;
-      motor_speed_r = STOP_SPEED;
+      motor_speed_r = BACK_SLOW;
       blocked_front = 0;
       
     } else if (to_right) {
@@ -182,7 +192,7 @@ bool obstacle_avoid(void) {
       Serial.println("Object to the right, turning left gradually \n");
       #endif
       // Turn left a little bit
-      motor_speed_l = STOP_SPEED;
+      motor_speed_l = BACK_SLOW;
       motor_speed_r = FORWARD_SLOW;
       blocked_front = 0;
       
