@@ -23,6 +23,7 @@
 #define CALIB_STEPS   1
 #define HOR_RETURN    50
 #define VER_RETURN    90
+#define DROP_STEPS    600
 #define FAILED_DELAY  1000
 
 

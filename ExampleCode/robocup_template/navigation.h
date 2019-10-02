@@ -13,15 +13,16 @@
 // Speed constants
 #define STEP          150
 #define FORWARD_FULL  2000
-#define FORWARD_SLOW  1700
-#define BACK_FULL     1200
-#define BACK_SLOW     1300
+#define FORWARD_SLOW  1800
+#define APPROACHING   1700
+#define BACK_FULL     1100
+#define BACK_SLOW     1200
 // Navigation constants
 #define DESIRED_POS   1023 / 2
 #define ERROR_MARG    125
-#define KP            0.6
+#define KP            0.7
 #define KI            0
-#define KD            0.005
+#define KD            0.001
 #define PID_HOLD      FORWARD_SLOW
 #define MAX_WAIT      5
 #define BLOCKED_DELAY 100
