@@ -36,13 +36,13 @@
 // ALL OF THESE VALUES WILL NEED TO BE SET TO SOMETHING USEFUL !!!!!!!!!!!!!!!!!!!!
 #define US_SEND_TASK_PERIOD                 500
 #define IR_READ_TASK_PERIOD                 20
-#define CAM_READ_TASK_PERIOD                50
+#define CAM_READ_TASK_PERIOD                100
 #define TOF_READ_TASK_PERIOD                100
-#define IMU_READ_TASK_PERIOD                50
-#define SENSOR_AVERAGE_PERIOD               50
-#define SET_MOTOR_TASK_PERIOD               50
-#define NAVIGATE_TASK_PERIOD                50
-#define WEIGHT_SCAN_TASK_PERIOD             50
+#define IMU_READ_TASK_PERIOD                100
+#define SENSOR_AVERAGE_PERIOD               100
+#define SET_MOTOR_TASK_PERIOD               100
+#define NAVIGATE_TASK_PERIOD                100
+#define WEIGHT_SCAN_TASK_PERIOD             100
 #define COLLECT_WEIGHT_TASK_PERIOD          100
 #define CHECK_WATCHDOG_TASK_PERIOD          1000
 #define VICTORY_DANCE_TASK_PERIOD           200

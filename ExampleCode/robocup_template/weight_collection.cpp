@@ -34,7 +34,7 @@ void gantry_init(void)
   current_t = start_t + 1;  // To initialize
   
   while(!hor_trig && current_t - start_t < MAX_TIME) {
-    drive_step(CALIB_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, LEFT);
+    drive_step(CALIB_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, LEFT_S);
     
     Q3 = Q2;
     Q2 = Q1;
@@ -45,7 +45,7 @@ void gantry_init(void)
     current_t = millis();
   }
   
-  drive_step(HOR_RETURN, HOR_STEP_PIN, HOR_DIR_PIN, RIGHT);
+  drive_step(HOR_RETURN, HOR_STEP_PIN, HOR_DIR_PIN, RIGHT_S);
   
   #if DEBUG
   if (hor_trig) {
@@ -60,7 +60,7 @@ void gantry_init(void)
   Q3 = true;
   
   while(!ver_trig && current_t - start_t < MAX_TIME) {
-    drive_step(CALIB_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
+    drive_step(CALIB_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN_S);
 
     Q3 = Q2;
     Q2 = Q1;
@@ -71,7 +71,7 @@ void gantry_init(void)
     current_t = millis();
   }
   
-  drive_step(VER_RETURN, VER_STEP_PIN, VER_DIR_PIN, UP);
+  drive_step(VER_RETURN, VER_STEP_PIN, VER_DIR_PIN, UP_S);
   
   #if DEBUG
   Serial.println("Vertical stepper initialised\n");
@@ -147,23 +147,25 @@ void collect_weight(void)
         
         digitalWrite(MAG_PIN, HIGH);
         delay(500);
-        drive_step(100, VER_STEP_PIN, VER_DIR_PIN, DOWN);
-        drive_step(100, VER_STEP_PIN, VER_DIR_PIN, UP);
-        drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, UP);
+        drive_step(PUSH_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN_S);
+        drive_step(PUSH_STEPS, VER_STEP_PIN, VER_DIR_PIN, UP_S);
+        drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, UP_S);
         induct_state = digitalRead(INDUCTIVE_PIN);
         
         if (!induct_state) {  // Pickup unsuccessful
           #if DEBUG
           Serial.println("Inductive not active \n");
           #endif
-          drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
+          drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN_S);
           attempts++;
           
         } else {  // Pickup successful
-          drive_step(HOR_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, RIGHT);
+          drive_step(HOR_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, RIGHT_S);
+          drive_step(600, VER_STEP_PIN, VER_DIR_PIN, DOWN_S);
+          drive_step(600, VER_STEP_PIN, VER_DIR_PIN, UP_S);
           digitalWrite(MAG_PIN, LOW);
-          drive_step(HOR_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, LEFT);
-          drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN);
+          drive_step(HOR_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, LEFT_S);
+          drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN_S);
           
           #if DEBUG
           Serial.println("Collection complete \n");
@@ -171,7 +173,7 @@ void collect_weight(void)
           state_change = true;
           robot_state = NO_WEIGHT;
           weight_count++;
-          if (weight_count >= 2) {
+          if (weight_count >= MAX_WEIGHTS) {
             collection_complete = true;
           }
           attempts = 0;

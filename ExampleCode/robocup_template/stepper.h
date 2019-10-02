@@ -5,8 +5,8 @@
 #ifndef STEPPER_H_
 #define STEPPER_H_
 
-enum stepper_ver {UP = 0, DOWN};
-enum stepper_hor {LEFT = 0, RIGHT};
+enum stepper_ver {UP_S = 0, DOWN_S};
+enum stepper_hor {LEFT_S = 0, RIGHT_S};
 
 extern int current_pos;
 

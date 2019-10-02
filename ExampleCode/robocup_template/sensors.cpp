@@ -19,8 +19,6 @@
 #define MIN_SHORT_ANALOG  30
 #define MIN_MEDIUM_ANALOG 50
 
-enum ir_dir {LEFT = 0, RIGHT, FRONT, NUM_IR_SENS};
-
 ir_array_t ir_array;
 DFRobotVL53L0X tof_sensor;
 
@@ -160,12 +158,12 @@ void sensor_average(void){
   average = average_buf(&ir_array.front);
   ir_averages.front = convert_ir_dist(average, SHORT);
   
-//  #if DEBUG
+  #if DEBUG
   Serial.print("Averaging the sensors (L, F, R) ");
   Serial.print(ir_averages.left);
   Serial.print(" ");
   Serial.print(ir_averages.front);
   Serial.print(" ");
   Serial.println(ir_averages.right);
-//  #endif
+  #endif
 }

@@ -111,6 +111,8 @@
 #define LEFT_MOTOR_PIN      S6_2          //Pin corresponding to the left dc motor
 #define RIGHT_MOTOR_PIN     S6_1         //Pin corresponding to the right dc motor
 
+#define MAX_WEIGHTS        100
+
 // GLOBALS
 //states for swapping between searching and collecting
 enum robot_s {NO_WEIGHT = 0, WEIGHT_FOUND, WEIGHT_AHEAD};

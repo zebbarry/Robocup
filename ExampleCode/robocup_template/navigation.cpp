@@ -20,9 +20,10 @@ int32_t error_int, error_prev;
 
 // Navigation sequence
 void navigate(void) {
-//  #if DEBUG
-//  Serial.println("Running navigation");
-//  #endif
+  #if DEBUG
+  Serial.println("Running navigation");
+  #endif
+//  Serial.println(cam_x);
   bool obstacle_present = false;
 
   in_front     = ir_averages.front <= FRONT_LIMIT;
@@ -36,13 +37,11 @@ void navigate(void) {
       obstacle_present = obstacle_avoid();
 
       if (!obstacle_present) {
-//        if (cam_x < 1023) {
-//          weight_follow();
-//        } else {
+        if (cam_x < 1023) {
+          weight_follow();
+        } else {
           wall_follow();
-//          motor_speed_l = STOP_SPEED;
-//          motor_speed_r = STOP_SPEED;
-//        }
+        }
       }
       break;
 
@@ -63,10 +62,44 @@ void navigate(void) {
 }
 
 
+enum angle_s check_ramp(float right2left, float back2front) {
+  // Checks angle of robot to  identify ramps, tilt right and tilt backwards is +ve.
+  int angle = FLAT;
+  if (abs(back2front) > MAX_FRWD_ANG) {
+    if (back2front > 0) {
+      // Tilted backwards - approaching ramp 
+      angle += BACK;
+    } else {
+      angle += FRWD;
+    }
+  }
+
+  if (abs(right2left) > MAX_SIDE_ANG) {
+    if (right2left > 0) {
+      // Tilted right - ramp under left wheel
+      if (angle != FLAT) {
+        angle = angle*2 + RGHT;
+      }
+    } else {
+      // Tilted left - ramp under right wheel
+      if (angle != FLAT) {
+        angle = angle*2 + LEFT;
+      }
+    }
+  }
+  return angle;
+}
+
+
 bool obstacle_avoid(void) {
   // Checks all direction avoiding obstacles if neccessary, returns false if no obstacles found.
   bool obstacle_present = true;
   static int blocked_front = 0;
+  enum angle_s angle = check_ramp(imu_s2s, imu_f2b);
+  #if DEBUG
+  Serial.print("Checking angle: ");
+  Serial.println(angle_s);
+  #endif
   
   if (in_front) {    // Object in front
     #if DEBUG
@@ -79,7 +112,7 @@ bool obstacle_avoid(void) {
       #endif
       // Back up and turn around
       motor_speed_l = BACK_SLOW;
-      motor_speed_r = BACK_SLOW;
+      motor_speed_r = BACK_SLOW  ;
       blocked_front = BLOCKED_DELAY;
       
     } else if (left_closer) {   // Object in front and closer to the left
@@ -108,24 +141,22 @@ bool obstacle_avoid(void) {
         #endif
         blocked_front--;
 
-        if (left_closer) {
+//        if (left_closer) {
           #if DEBUG
-          Serial.println("Left object closer, spinning right");
+          Serial.println("Forced turning, spinning right");
           #endif
           // Turn right
           motor_speed_l = FORWARD_SLOW;
           motor_speed_r = BACK_SLOW;
-          blocked_front = 0;
           
-        } else {
-          #if DEBUG
-          Serial.println("Right object closer, spinning left");
-          #endif
-          // Turn lwft
-          motor_speed_l = BACK_SLOW;
-          motor_speed_r = FORWARD_SLOW;
-          blocked_front = 0;
-        }
+//        } else {
+//          #if DEBUG
+//          Serial.println("Right object closer, spinning left");
+//          #endif
+//          // Turn lwft
+//          motor_speed_l = BACK_SLOW;
+//          motor_speed_r = FORWARD_SLOW;
+//        }
         
       } else {
         #if DEBUG
@@ -134,6 +165,7 @@ bool obstacle_avoid(void) {
         // Turn around
         motor_speed_l = FORWARD_SLOW;
         motor_speed_r = FORWARD_SLOW;
+        blocked_front = 0;
       }
       
     } else if (to_left) { // Wall to left
