@@ -69,9 +69,24 @@ void navigate(void) {
 }
 
 
+
+bool check_angle(float angle) {
+  // rewturns true if angle is greater than max
+  bool result = false;
+  
+  if (abs(angle) > MAX_FRWD_ANG) {
+    if (angle > 0) {
+      // Tilted backwards - approaching ramp 
+      result = true;
+    }
+  }
+}
+
+
 enum angle_s check_ramp(float right2left, float back2front) {
   // Checks angle of robot to  identify ramps, tilt right and tilt backwards is +ve.
   int angle = FLAT;
+  
   if (abs(back2front) > MAX_FRWD_ANG) {
     if (back2front > 0) {
       // Tilted backwards - approaching ramp 
@@ -105,10 +120,10 @@ bool obstacle_avoid(void) {
   enum angle_s angle = check_ramp(imu_s2s, imu_f2b);
   #if DEBUG
   Serial.print("Checking angle: ");
-  Serial.println(angle_s);
+  Serial.println(angle);
   #endif
   
-  if (in_front) {    // Object in front
+  if (in_front || angle == BACK || angle == BACK_LEFT || angle == BACK_RGHT) {    // Object in front
     #if DEBUG
     Serial.println("Object in front");
     #endif
@@ -122,7 +137,7 @@ bool obstacle_avoid(void) {
       motor_speed_r = BACK_SLOW  ;
       blocked_front = BLOCKED_DELAY;
       
-    } else if (left_closer) {   // Object in front and closer to the left
+    } else if (left_closer || angle == BACK_RGHT) {   // Object in front and closer to the left
       #if DEBUG
       Serial.println("Object also closer to the left, spinning right");
       #endif
@@ -178,7 +193,7 @@ bool obstacle_avoid(void) {
         blocked_front = 0;
       }
       
-    } else if (to_left) { // Wall to left
+    } else if (to_left || angle == RGHT) { // Wall to left
       #if DEBUG
       Serial.println("Object to the left, turning right gradually \n");
       #endif
@@ -187,7 +202,7 @@ bool obstacle_avoid(void) {
       motor_speed_r = BACK_SLOW;
       blocked_front = 0;
       
-    } else if (to_right) {
+    } else if (to_right || angle == LEFT) {
       #if DEBUG
       Serial.println("Object to the right, turning left gradually \n");
       #endif

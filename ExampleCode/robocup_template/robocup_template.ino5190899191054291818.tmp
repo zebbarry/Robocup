@@ -126,10 +126,9 @@ void task_init();
 // put your setup code here, to run once:
 //**********************************************************************************
 void setup() {
-//  #if DEBUG
+  #if DEBUG
   Serial.begin(BAUD_RATE);
-  Serial.println("Starting robot");
-//  #endif
+  #endif
   pin_init();
   robot_init();
   task_init();
@@ -222,6 +221,7 @@ void task_init() {
   tCollect_weight.enable();
   tCheck_watchdog.enable();
 //  tVictory_dance.enable();
+  
   
   #if DEBUG 
   Serial.println("Tasks have been initialised \n");

@@ -31,6 +31,8 @@ extern float imu_f2b;
 
 void sensor_init(void);
 
+void reset_imu(void);
+
 void tof_init(void);
 
 void read_tof(void);
