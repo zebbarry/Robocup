@@ -154,11 +154,12 @@ void pin_init(){
   pinMode(HOR_CALIB, INPUT);
   pinMode(VER_CALIB, INPUT);
   
-  sensor_init();
-  //    tof_init();
   imu_init();
   cam_init();
+  sensor_init();
+  //    tof_init()
   gantry_init();
+  reset_imu();
   
   #if DEBUG
   Serial.println("Pins have been initialised \n"); 
@@ -210,7 +211,7 @@ void task_init() {
   tRead_cam.enable();
   tRead_imu.enable();
   tSensor_average.enable();
-  tSet_motor.enable();
+//  tSet_motor.enable();
   tNavigate.enable();
   tWeight_scan.enable();
   tCollect_weight.enable();

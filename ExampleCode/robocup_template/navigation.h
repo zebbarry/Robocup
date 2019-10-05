@@ -10,6 +10,8 @@
 #define LEFT_LIMIT    200 // mm
 #define RIGHT_LIMIT   200
 #define FRONT_LIMIT   150
+#define TOF_LIMIT     100
+
 // Speed constants
 #define STEP          150
 #define FORWARD_FULL  2000
@@ -17,6 +19,7 @@
 #define APPROACHING   1700
 #define BACK_FULL     1100
 #define BACK_SLOW     1200
+
 // Navigation constants
 #define DESIRED_POS   1023 / 2
 #define ERROR_MARG    125
@@ -33,6 +36,8 @@ enum angle_s {FLAT = 0, FRWD, BACK, LEFT, RGHT, FRWD_LEFT, FRWD_RGHT, BACK_LEFT,
 
 // Navigation sequence
 void navigate(void);
+
+bool check_angle(float angle);
 
 enum angle_s check_ramp(float side2side, float front2back);
 
