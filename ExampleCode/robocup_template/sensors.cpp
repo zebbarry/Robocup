@@ -12,7 +12,6 @@
 #include <CircularBuffer.h>
 #include "Wire.h"
 #include "DFRobot_VL53L0X.h"
-//#include "Adafruit_VL53L0X.h"
 #include "pin_map.h"
 #include "imu.h"
 
@@ -23,10 +22,6 @@
 ir_array_t ir_array;
 DFRobotVL53L0X tof_sensor;
 
-//Adafruit_VL53L0X tof_sensor = Adafruit_VL53L0X();
-float pitch_init_cond;
-float roll_init_cond;
-
 void sensor_init(void) {
   #if DEBUG
   Serial.println("Initialise sensors \n");
@@ -36,16 +31,6 @@ void sensor_init(void) {
   pinMode(IR_SHORT_FRONT_PIN, INPUT);
   pinMode(INDUCTIVE_PIN, INPUT_PULLUP);
   pinMode(US_TRIG_PIN, OUTPUT);
-  pitch_init_cond = 0;
-  roll_init_cond  = 0;
-}
-
-
-void reset_imu(void) {
-  // Init imu with initial conditions.
-  sEul_t imu_eul = read_imu_eul();
-  pitch_init_cond = imu_eul.pitch;
-  roll_init_cond  = imu_eul.roll;
 }
 
 
@@ -54,13 +39,6 @@ void tof_init(void) {
   Serial.println("Initialise TOF camera");
   #endif
 
-  
-  
-//  Serial.println("Adafruit VL53L0X test");
-//  if (!tof_sensor.begin(0x50)) {
-//    Serial.println(F("Failed to boot VL53L0X"));
-//  } 
-
   tof_sensor.begin(TOF_ID);
   tof_sensor.setMode(Continuous, High);
   tof_sensor.start();
@@ -68,17 +46,11 @@ void tof_init(void) {
 
 
 void read_tof(void) {
-  tof_reading = tof_sensor.getDistance();
-  
-//  VL53L0X_RangingMeasurementData_t measure;
-//  
-//  tof_sensor.rangingTest(&measure, false); // pass in 'true' to get debug data printout!
-//  tof_reading = measure.RangeMilliMeter;
-  
   #if DEBUG
-  Serial.print("Reading TOF camera: ");
-  Serial.println(tof_reading);
+  Serial.println("Reading TOF camera \n");
   #endif
+
+  tof_reading = tof_sensor.getDistance();
 }
 
 
@@ -86,8 +58,8 @@ void read_tof(void) {
 void read_imu(void) {
   sEul_t imu_eul = read_imu_eul();
   
-  imu_s2s = imu_eul.pitch - pitch_init_cond;  // Tilt to right is +ve
-  imu_f2b = imu_eul.roll - roll_init_cond;   // Tilt forwards is +ve
+  imu_s2s = imu_eul.pitch;  // Tilt to right is +ve
+  imu_f2b = imu_eul.roll;   // Tilt forwards is +ve
   
   #if DEBUG
   Serial.print("Reading IMU sensor (P, R): ");
