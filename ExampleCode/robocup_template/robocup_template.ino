@@ -126,10 +126,7 @@ void task_init();
 // put your setup code here, to run once:
 //**********************************************************************************
 void setup() {
-//  #if DEBUG
   Serial.begin(BAUD_RATE);
-  Serial.println("Starting robot");
-//  #endif
   pin_init();
   robot_init();
   task_init();
@@ -157,14 +154,11 @@ void pin_init(){
   pinMode(HOR_CALIB, INPUT);
   pinMode(VER_CALIB, INPUT);
   
-  delay(100);
-  
-//  tof_init();
-  cam_init();
-  imu_init();
   sensor_init();
+  //    tof_init();
+  imu_init();
+  cam_init();
   gantry_init();
-  reset_imu();
   
   #if DEBUG
   Serial.println("Pins have been initialised \n"); 
@@ -222,6 +216,7 @@ void task_init() {
   tCollect_weight.enable();
   tCheck_watchdog.enable();
 //  tVictory_dance.enable();
+  
   
   #if DEBUG 
   Serial.println("Tasks have been initialised \n");
