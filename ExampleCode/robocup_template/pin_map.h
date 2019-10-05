@@ -6,7 +6,7 @@
 #define PIN_MAP_H_
 
 // Debug mode -- 1 if compile serial outputs
-#define DEBUG 0
+#define DEBUG 1
 
 // Arduino ports
 // Analog
