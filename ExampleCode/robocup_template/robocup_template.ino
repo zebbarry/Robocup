@@ -43,7 +43,7 @@
 #define SET_MOTOR_TASK_PERIOD               100
 #define NAVIGATE_TASK_PERIOD                100
 #define WEIGHT_SCAN_TASK_PERIOD             100
-#define COLLECT_WEIGHT_TASK_PERIOD          100
+#define COLLECT_WEIGHT_TASK_PERIOD          70
 #define CHECK_WATCHDOG_TASK_PERIOD          1000
 #define VICTORY_DANCE_TASK_PERIOD           200
 
@@ -215,7 +215,7 @@ void task_init() {
   tRead_cam.enable();
   tRead_imu.enable();
   tSensor_average.enable();
-//  tSet_motor.enable();
+  tSet_motor.enable();
   tNavigate.enable();
   tWeight_scan.enable();
   tCollect_weight.enable();
@@ -245,6 +245,7 @@ void loop() {
     tCheck_watchdog.disable();
     state_change = false;
     led_set(RED, GREEN, BLUE, false, false, true);  // Turn on Blue
+    led_off(RED);
   } else if (state_change && robot_state == WEIGHT_AHEAD) {
     tCollect_weight.enable();
     tCheck_watchdog.enable();
@@ -255,9 +256,11 @@ void loop() {
       tWeight_scan.disable();
       tCollect_weight.disable();
       tCheck_watchdog.disable();
-      led_set(RED, GREEN, BLUE, false, false, false);  // Turn on Red
+      state_change = false;
+      led_set(RED, GREEN, BLUE, false, false, false);  // Turn off
     }
     led_toggle(GREEN);
+    delay(1000);
   }
   
   taskManager.execute();    // Execute the scheduler

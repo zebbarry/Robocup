@@ -30,10 +30,11 @@
 #define KD            0.001
 #define PID_HOLD      FORWARD_SLOW
 #define MAX_WAIT      5
-#define BLOCKED_DELAY 100
-#define RAMP_DELAY    100
+#define BLOCKED_DELAY 25
+#define RAMP_DELAY    25
+#define REVERSE_DELAY 10
 #define MAX_FRWD_ANG  8
-#define MAX_SIDE_ANG  5
+#define MAX_SIDE_ANG  6
 
 enum angle_s {FLAT = 0, FRWD, BACK, LEFT, RGHT, FRWD_LEFT, FRWD_RGHT, BACK_LEFT, BACK_RGHT};
 

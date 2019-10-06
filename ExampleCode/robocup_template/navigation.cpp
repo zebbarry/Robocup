@@ -28,7 +28,7 @@ void navigate(void) {
   ramp_present = !digitalRead(RAMP_L_PIN) || !digitalRead(RAMP_R_PIN);
   
   
-  in_front     = ir_averages.front <= FRONT_LIMIT || ramp_present;
+  in_front     = ir_averages.front <= FRONT_LIMIT;
   to_left      = ir_averages.left  <= LEFT_LIMIT;
   to_right     = ir_averages.right <= RIGHT_LIMIT;
   left_closer  = ir_averages.left   < ir_averages.right;
@@ -103,14 +103,10 @@ enum angle_s check_ramp(float right2left, float back2front) {
   if (abs(right2left) > MAX_SIDE_ANG) {
     if (right2left > 0) {
       // Tilted right - ramp under left wheel
-      if (angle != FLAT) {
-        angle = angle*2 + RGHT;
-      }
+      angle = angle*2 + RGHT;
     } else {
       // Tilted left - ramp under right wheel
-      if (angle != FLAT) {
-        angle = angle*2 + LEFT;
-      }
+      angle = angle*2 + LEFT;
     }
   }
   return angle;
@@ -125,13 +121,13 @@ bool obstacle_avoid(void) {
   static enum angle_s angle = FLAT;
   static enum angle_s prev_angle = FLAT;
   angle = check_ramp(imu_s2s, imu_f2b);
-//  #if DEBUG
+  #if DEBUG
   Serial.print("Checking angle: ");
   Serial.println(angle);
-//  #endif
+  #endif
 
 
-  if ((angle == FLAT || angle == FRWD) && blocked_ramp <= 0) {
+  if ((angle == FLAT || angle == FRWD) && blocked_ramp <= 0 && !ramp_present) {
     if (in_front) {    // Object in front          ------------------
       #if DEBUG
       Serial.println("Object in front");
@@ -247,13 +243,13 @@ bool obstacle_avoid(void) {
       }
     }
   } else {
-    if (angle == BACK) {
+    if (angle == BACK || ramp_present) {
       #if DEBUG
       Serial.println("Tilted back, reversing \n");
       #endif
       motor_speed_l = BACK_SLOW;
       motor_speed_r = BACK_SLOW;
-      blocked_ramp = RAMP_DELAY;
+      blocked_ramp = RAMP_DELAY + REVERSE_DELAY;
       prev_angle = angle;
       
     } else if (angle == BACK_RGHT) {
@@ -277,7 +273,7 @@ bool obstacle_avoid(void) {
       #if DEBUG
       Serial.println("Tilted to the left, turning left\n");
       #endif
-      motor_speed_l = STOP_SPEED + STEP;
+      motor_speed_l = STOP_SPEED;
       motor_speed_r = FORWARD_SLOW;
       prev_angle = angle;
       
@@ -286,10 +282,10 @@ bool obstacle_avoid(void) {
       Serial.println("Tilted to the right, turning right\n");
       #endif
       motor_speed_l = FORWARD_SLOW;
-      motor_speed_r = STOP_SPEED + STEP;
+      motor_speed_r = STOP_SPEED;
       prev_angle = angle;
       
-    } else if (blocked_ramp > 0) {    // Blocked ramp delay
+  } else if (blocked_ramp < RAMP_DELAY) {    // Blocked ramp delay and finished reversing off ramp
       if (left_closer) {   // Object in front and closer to the left
         #if DEBUG
         Serial.println("Ramp infront and object closest to left, spinning right");
@@ -306,8 +302,6 @@ bool obstacle_avoid(void) {
         motor_speed_l = BACK_SLOW;
         motor_speed_r = FORWARD_SLOW;
       }
-    } else {
-      led_set(RED, GREEN, BLUE, true, true, true);
     }
   }
 
