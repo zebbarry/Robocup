@@ -12,6 +12,7 @@
 #include <CircularBuffer.h>
 #include "Wire.h"
 #include "DFRobot_VL53L0X.h"
+//#include "Adafruit_VL53L0X.h"
 #include "pin_map.h"
 #include "imu.h"
 
@@ -23,6 +24,8 @@ ir_array_t ir_array;
 DFRobotVL53L0X tof_sensor;
 float pitch_init_cond, roll_init_cond;
 
+//Adafruit_VL53L0X tof_sensor = Adafruit_VL53L0X();
+
 void sensor_init(void) {
   #if DEBUG
   Serial.println("Initialise sensors \n");
@@ -33,7 +36,7 @@ void sensor_init(void) {
   pinMode(INDUCTIVE_PIN, INPUT_PULLUP);
   pinMode(US_TRIG_PIN, OUTPUT);
   pitch_init_cond = 0;
-  roll_init_cond = 0;
+  roll_init_cond  = 0;
 }
 
 
@@ -42,6 +45,13 @@ void tof_init(void) {
   Serial.println("Initialise TOF camera");
   #endif
 
+  
+  
+//  Serial.println("Adafruit VL53L0X test");
+//  if (!tof_sensor.begin(0x50)) {
+//    Serial.println(F("Failed to boot VL53L0X"));
+//  } 
+
   tof_sensor.begin(TOF_ID);
   tof_sensor.setMode(Continuous, High);
   tof_sensor.start();
@@ -49,16 +59,23 @@ void tof_init(void) {
 
 
 void read_tof(void) {
-  #if DEBUG
-  Serial.println("Reading TOF camera \n");
-  #endif
-
   tof_reading = tof_sensor.getDistance();
+  
+//  VL53L0X_RangingMeasurementData_t measure;
+//  
+//  tof_sensor.rangingTest(&measure, false); // pass in 'true' to get debug data printout!
+//  tof_reading = measure.RangeMilliMeter;
+  
+  #if DEBUG
+  Serial.print("Reading TOF camera: ");
+  Serial.println(tof_reading);
+  #endif
 }
 
 
 
 void read_imu(void) {
+  // Init imu with initial conditions.
   sEul_t imu_eul = read_imu_eul();
   
   imu_s2s = imu_eul.pitch - pitch_init_cond;  // Tilt to right is +ve
@@ -79,12 +96,12 @@ void reset_imu(void) {
   pitch_init_cond = imu_eul.pitch;
   roll_init_cond = imu_eul.roll;
   
-//  #if DEBUG
+  #if DEBUG
   Serial.print("Resetting IMU sensor (P, R): ");
   Serial.print(pitch_init_cond);
   Serial.print(", ");
   Serial.println(roll_init_cond);
-//  #endif
+  #endif
 }
 
 

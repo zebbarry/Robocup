@@ -44,7 +44,7 @@ void gantry_init(void)
     }    
     current_t = millis();
   }
-  
+  delay(
   drive_step(HOR_RETURN, HOR_STEP_PIN, HOR_DIR_PIN, RIGHT_S);
   
   #if DEBUG
@@ -74,7 +74,11 @@ void gantry_init(void)
   drive_step(VER_RETURN, VER_STEP_PIN, VER_DIR_PIN, UP_S);
   
   #if DEBUG
-  Serial.println("Vertical stepper initialised\n");
+  if (ver_trig) {
+    Serial.println("Vertical stepper initialised");
+  } else {
+    Serial.println("Max time reached");
+  }
   #endif
 }
 

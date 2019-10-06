@@ -94,7 +94,8 @@
 #define GREEN               DI6
 #define BLUE                DI7
 #define US_TRIG_PIN         A4 // Wrong
-#define LIMIT_PIN           DO4
+#define RAMP_R_PIN          DI12
+#define RAMP_L_PIN          DI10
 #define MAG_PIN             DI1
 #define FAN_PIN             DI7 // Wrong
 #define CHAN_PIN            DI4
