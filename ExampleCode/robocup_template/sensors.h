@@ -37,6 +37,8 @@ void read_tof(void);
 
 void read_imu(void);
 
+void reset_imu(void);
+
 int average_buf(CircularBuffer<int, IR_BUF_SIZE>* buf);
 
 // Convert analog value to mm

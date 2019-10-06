@@ -21,6 +21,7 @@
 
 ir_array_t ir_array;
 DFRobotVL53L0X tof_sensor;
+float pitch_init_cond, roll_init_cond;
 
 void sensor_init(void) {
   #if DEBUG
@@ -31,6 +32,8 @@ void sensor_init(void) {
   pinMode(IR_SHORT_FRONT_PIN, INPUT);
   pinMode(INDUCTIVE_PIN, INPUT_PULLUP);
   pinMode(US_TRIG_PIN, OUTPUT);
+  pitch_init_cond = 0;
+  roll_init_cond = 0;
 }
 
 
@@ -58,8 +61,8 @@ void read_tof(void) {
 void read_imu(void) {
   sEul_t imu_eul = read_imu_eul();
   
-  imu_s2s = imu_eul.pitch;  // Tilt to right is +ve
-  imu_f2b = imu_eul.roll;   // Tilt forwards is +ve
+  imu_s2s = imu_eul.pitch - pitch_init_cond;  // Tilt to right is +ve
+  imu_f2b = imu_eul.roll - roll_init_cond;   // Tilt forwards is +ve
   
   #if DEBUG
   Serial.print("Reading IMU sensor (P, R): ");
@@ -67,6 +70,21 @@ void read_imu(void) {
   Serial.print(", ");
   Serial.println(imu_f2b);
   #endif
+}
+
+
+
+void reset_imu(void) {
+  sEul_t imu_eul = read_imu_eul();
+  pitch_init_cond = imu_eul.pitch;
+  roll_init_cond = imu_eul.roll;
+  
+//  #if DEBUG
+  Serial.print("Resetting IMU sensor (P, R): ");
+  Serial.print(pitch_init_cond);
+  Serial.print(", ");
+  Serial.println(roll_init_cond);
+//  #endif
 }
 
 
