@@ -126,7 +126,10 @@ void task_init();
 // put your setup code here, to run once:
 //**********************************************************************************
 void setup() {
+//  #if DEBUG
   Serial.begin(BAUD_RATE);
+  Serial.println("\n\n Starting robot\n");
+//  #endif
   pin_init();
   robot_init();
   task_init();
@@ -149,7 +152,7 @@ void pin_init(){
   
   pinMode(MAG_PIN, OUTPUT);
   digitalWrite(MAG_PIN, LOW);
-  pinMode(LIMIT_PIN, INPUT);
+  pinMode(RAMP_PIN, INPUT);
   pinMode(CHAN_PIN, INPUT);
   pinMode(HOR_CALIB, INPUT);
   pinMode(VER_CALIB, INPUT);
@@ -170,15 +173,15 @@ void pin_init(){
 // Set default robot state
 //**********************************************************************************
 void robot_init() {
-  #if DEBUG
-  Serial.println("Robot is ready \n");
-  #endif
-  
   motor_speed_l = STOP_SPEED;
   motor_speed_r = STOP_SPEED;
   state_change = true;
   robot_state = NO_WEIGHT;
   weight_count = 0;
+  
+  #if DEBUG
+  Serial.println("Robot is ready \n");
+  #endif
 }
 
 //**********************************************************************************

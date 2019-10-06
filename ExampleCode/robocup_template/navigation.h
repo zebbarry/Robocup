@@ -9,6 +9,8 @@
 // IR Limits
 #define LEFT_LIMIT    200 // mm
 #define RIGHT_LIMIT   200
+#define LEFT_EXT_LIMIT    80
+#define RIGHT_EXT_LIMIT   80
 #define FRONT_LIMIT   150
 #define TOF_LIMIT     100
 

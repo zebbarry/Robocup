@@ -15,7 +15,7 @@
 #include "led.h"
 
 // Local definitions
-bool in_front, to_left, to_right, left_closer, right_closer;
+bool in_front, to_left, to_right, left_closer, right_closer, to_right_extreme, to_left_extreme;
 int32_t error_int, error_prev;
 
 // Navigation sequence
@@ -25,12 +25,15 @@ void navigate(void) {
   #endif
 //  Serial.println(cam_x);
   bool obstacle_present = false;
-
-  in_front     = ir_averages.front <= FRONT_LIMIT;
+  int ramp_present = !digitalRead(RAMP_PIN);
+  
+  in_front     = ir_averages.front <= FRONT_LIMIT || ramp_present;
   to_left      = ir_averages.left  <= LEFT_LIMIT;
   to_right     = ir_averages.right <= RIGHT_LIMIT;
   left_closer  = ir_averages.left   < ir_averages.right;
   right_closer = ir_averages.left   > ir_averages.right;
+  to_left_extreme      = ir_averages.left  <= LEFT_EXT_LIMIT;
+  to_right_extreme     = ir_averages.right <= RIGHT_EXT_LIMIT;
 
   switch(robot_state) {
     case NO_WEIGHT:
@@ -194,22 +197,42 @@ bool obstacle_avoid(void) {
       }
       
     } else if (to_left || angle == RGHT) { // Wall to left
-      #if DEBUG
-      Serial.println("Object to the left, turning right gradually \n");
-      #endif
-      // Turn right a little bit
-      motor_speed_l = FORWARD_SLOW;
-      motor_speed_r = BACK_SLOW;
       blocked_front = 0;
       
-    } else if (to_right || angle == LEFT) {
-      #if DEBUG
-      Serial.println("Object to the right, turning left gradually \n");
-      #endif
-      // Turn left a little bit
-      motor_speed_l = BACK_SLOW;
-      motor_speed_r = FORWARD_SLOW;
+      if (to_left_extreme) {
+        #if DEBUG
+        Serial.println("Object to the left, spinning right\n");
+        #endif
+        // Turn right a little bit
+        motor_speed_l = FORWARD_SLOW;
+        motor_speed_r = BACK_SLOW;
+      } else {
+        #if DEBUG
+        Serial.println("Object to the left, turning right gradually \n");
+        #endif
+        // Turn right a little bit
+        motor_speed_l = FORWARD_SLOW;
+        motor_speed_r = STOP_SPEED;
+      }
+      
+    } else if (to_right || angle == LEFT) { // Wall to right
       blocked_front = 0;
+      
+      if (to_right_extreme) {
+        #if DEBUG
+        Serial.println("Object to the right, spinning left\n");
+        #endif
+        // Turn right a little bit
+        motor_speed_l = BACK_SLOW;
+        motor_speed_r = FORWARD_SLOW;
+      } else {
+        #if DEBUG
+        Serial.println("Object to the right, turning left gradually \n");
+        #endif
+        // Turn right a little bit
+        motor_speed_l = STOP_SPEED;
+        motor_speed_r = FORWARD_SLOW;
+      }
       
     } else {
       #if DEBUG
