@@ -16,7 +16,6 @@
 
 int attempts;
 
-
 void gantry_init(void)
 {
   #if DEBUG
@@ -104,6 +103,10 @@ void weight_scan(void)
     if (robot_state != WEIGHT_AHEAD) {
       robot_state = WEIGHT_AHEAD;
       state_change = true;
+      left_motor.writeMicroseconds(STOP_SPEED);
+      right_motor.writeMicroseconds(STOP_SPEED);
+      motor_speed_l = STOP_SPEED;
+      motor_speed_r = STOP_SPEED;
       gantry_init();
     }
   }
@@ -167,7 +170,6 @@ void collect_weight(void)
       if (digitalRead(INDUCTIVE_PIN)) {
         
         digitalWrite(MAG_PIN, HIGH);
-        delay(500);
         drive_step(PUSH_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN_S);
         drive_step(PUSH_STEPS, VER_STEP_PIN, VER_DIR_PIN, UP_S);
         drive_step(VER_STEPS, VER_STEP_PIN, VER_DIR_PIN, UP_S);
@@ -184,6 +186,7 @@ void collect_weight(void)
           
         } else {  // Pickup successful
           drive_step(HOR_STEPS, HOR_STEP_PIN, HOR_DIR_PIN, RIGHT_S);
+          induct_state = digitalRead(INDUCTIVE_PIN);
           drive_step(DROP_STEPS, VER_STEP_PIN, VER_DIR_PIN, DOWN_S);
           digitalWrite(MAG_PIN, LOW);
           drive_step(DROP_STEPS, VER_STEP_PIN, VER_DIR_PIN, UP_S);
@@ -195,7 +198,11 @@ void collect_weight(void)
           #endif
           state_change = true;
           robot_state = NO_WEIGHT;
-          weight_count++;
+          
+          if (induct_state) {
+            weight_count++;
+          }
+          
           if (weight_count >= MAX_WEIGHTS) {
             robot_state = COMP_OVER;
             state_change = true;
@@ -216,8 +223,14 @@ void victory_dance(void) {
   #if DEBUG
   Serial.println("Victory dance ");
   #endif
-  digitalWrite(FAN_PIN, HIGH);
-  delay(5000);
-  digitalWrite(FAN_PIN, LOW);
-  delay(1000);
+  led_toggle(GREEN);
+//  static bool state = false;
+//  state = !state;
+//  if (state) {    
+//    set_led_strip(CRGB::Black, true);
+//    set_led_strip(CRGB::Black, false);
+//  } else {
+//    set_led_strip(CRGB::Green, true);
+//    set_led_strip(CRGB::Green, false);
+//  }
 }

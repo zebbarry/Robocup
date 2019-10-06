@@ -23,9 +23,16 @@ void navigate(void) {
   #if DEBUG
   Serial.println("Running navigation");
   #endif
-//  Serial.println(cam_x);
   bool obstacle_present = false;
   ramp_present = !digitalRead(RAMP_L_PIN) || !digitalRead(RAMP_R_PIN);
+
+//  if (ramp_present) {
+//    led_on(RED);
+//    left_motor.writeMicroseconds(STOP_SPEED);
+//    right_motor.writeMicroseconds(STOP_SPEED);
+//    delay(5000);
+//    led_off(RED);
+//  }
   
   
   in_front     = ir_averages.front <= FRONT_LIMIT;
@@ -42,10 +49,8 @@ void navigate(void) {
 
       if (!obstacle_present) {
         if (cam_x < 1023) {
-          led_toggle(BLUE);
           weight_follow();
         } else {
-          led_on(BLUE);
           wall_follow();
         }
       }
@@ -127,13 +132,13 @@ bool obstacle_avoid(void) {
   #endif
 
 
-  if ((angle == FLAT || angle == FRWD) && blocked_ramp <= 0 && !ramp_present) {
-    if (in_front) {    // Object in front          ------------------
+  if ((angle == FLAT || angle == FRWD) && blocked_ramp <= 0) {
+    if (in_front || ramp_present) {    // Object in front          ------------------
       #if DEBUG
       Serial.println("Object in front");
       #endif
       
-      if (to_left && to_right) { // Object in front and left and right
+      if (to_left && to_right || ramp_present) { // Object in front and left and right
         #if DEBUG
         Serial.println("Cornered, reversing\n");
         #endif
@@ -141,24 +146,23 @@ bool obstacle_avoid(void) {
         motor_speed_l = BACK_SLOW;
         motor_speed_r = BACK_SLOW;
         blocked_front = BLOCKED_DELAY;
+        led_on(BLUE);
         
-      } else if (left_closer) {   // Object in front and closer to the left
-        #if DEBUG
-        Serial.println("Object also closer to the left, spinning right");
-        #endif
-        // Turn right
-        motor_speed_l = FORWARD_SLOW;
-        motor_speed_r = BACK_SLOW;
-        blocked_front = 0;
-        
-      } else {  // Object to right
+      } else if (right_closer) {  // Object to right
         #if DEBUG
         Serial.println("Object also closer to the right, spinning left \n");
         #endif
         // Turn left
         motor_speed_l = BACK_SLOW;
         motor_speed_r = FORWARD_SLOW;
-        blocked_front = 0;
+        
+      } else {   // Object in front and closer to the left
+        #if DEBUG
+        Serial.println("Object also closer to the left, spinning right");
+        #endif
+        // Turn right
+        motor_speed_l = FORWARD_SLOW;
+        motor_speed_r = BACK_SLOW;
       }
     } else {                     // Nothing in front                        --------------------------
       if (to_left && to_right) { // In a channel
@@ -167,7 +171,7 @@ bool obstacle_avoid(void) {
           Serial.println("Obstacles left, right and previously in front. \n");
           #endif
           
-          if (blocked_front == BLOCKED_DELAY) {   // Pick a direction and keep turning that way
+          if (motor_speed_l == BACK_SLOW && motor_speed_r == BACK_SLOW) {   // Pick a direction and keep turning that way
             if (left_closer) {
               #if DEBUG
               Serial.println("Forced turning, spinning right");
@@ -194,10 +198,10 @@ bool obstacle_avoid(void) {
           motor_speed_l = FORWARD_SLOW;
           motor_speed_r = FORWARD_SLOW;
           blocked_front = 0;
+          led_off(BLUE);
         }
         
       } else if (to_left) { // Wall to left
-        blocked_front = 0;
         
         if (to_left_extreme) {
           #if DEBUG
@@ -216,7 +220,6 @@ bool obstacle_avoid(void) {
         }
         
       } else if (to_right) { // Wall to right
-        blocked_front = 0;
         
         if (to_right_extreme) {
           #if DEBUG
@@ -242,8 +245,8 @@ bool obstacle_avoid(void) {
         blocked_front = 0;
       }
     }
-  } else {
-    if (angle == BACK || ramp_present) {
+  } else {                                // RAMP -------------
+    if (angle == BACK) {
       #if DEBUG
       Serial.println("Tilted back, reversing \n");
       #endif
@@ -285,7 +288,7 @@ bool obstacle_avoid(void) {
       motor_speed_r = STOP_SPEED;
       prev_angle = angle;
       
-  } else if (blocked_ramp < RAMP_DELAY) {    // Blocked ramp delay and finished reversing off ramp
+  } else if (blocked_ramp == RAMP_DELAY) {    // Blocked ramp delay and finished reversing off ramp
       if (left_closer) {   // Object in front and closer to the left
         #if DEBUG
         Serial.println("Ramp infront and object closest to left, spinning right");

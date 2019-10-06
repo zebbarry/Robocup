@@ -6,8 +6,14 @@
 #define LED_H_
 
 #include <stdint.h>
+#include <FastLED.h>
+
 
 void led_init(void);
+
+void set_led_strip(CRGB colour, int side);
+
+void police(void);
 
 void led_on(int led_pin);
 

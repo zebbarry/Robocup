@@ -84,7 +84,7 @@
 #define IMU_ID  0x28
 
 // IR Sensor Pins
-#define IR_SHORT_LEFT_PIN   A1
+#define IR_SHORT_LEFT_PIN   A6
 #define IR_SHORT_RIGHT_PIN  A0
 #define IR_SHORT_FRONT_PIN  A2
 
@@ -93,14 +93,18 @@
 #define RED                 DI8
 #define GREEN               DI6
 #define BLUE                DI7
-#define US_TRIG_PIN         A4 // Wrong
+#define US_TRIG_PIN         A4
 #define RAMP_R_PIN          DI12
 #define RAMP_L_PIN          DI10
 #define MAG_PIN             DI1
-#define FAN_PIN             DI7 // Wrong
 #define CHAN_PIN            DI4
 #define VER_CALIB           DI3
 #define HOR_CALIB           DI2
+
+// LED Strip
+#define LEFT_STRIP_PIN      DO4
+#define RIGHT_STRIP_PIN     DO3
+
 
 // Stepper Pins
 #define HOR_DIR_PIN         DO8

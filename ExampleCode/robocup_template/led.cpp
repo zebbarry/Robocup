@@ -9,11 +9,19 @@
 #include "Arduino.h"
 #include "pin_map.h"
 #include "led.h"
+#include <FastLED.h>
 
+// How many leds in your strip?
+#define NUM_LEDS            16
+#define BRIGHTNESS          80
+
+// Define the array of leds
+CRGB leds_l[NUM_LEDS];
+CRGB leds_r[NUM_LEDS];
 
 void led_init(void) {
   #if DEBUG
-  Serial.println("Initialise led \n");
+  Serial.println("Initialise LEDs \n");
   #endif
   pinMode(RED, OUTPUT);
   pinMode(GREEN, OUTPUT);
@@ -21,6 +29,43 @@ void led_init(void) {
   digitalWrite(RED, LOW);
   digitalWrite(GREEN, LOW);
   digitalWrite(BLUE, LOW);
+
+  //  LED strip
+  FastLED.addLeds<NEOPIXEL, LEFT_STRIP_PIN>(leds_l, NUM_LEDS);
+  FastLED.addLeds<NEOPIXEL, RIGHT_STRIP_PIN>(leds_r, NUM_LEDS);
+  FastLED.setBrightness(BRIGHTNESS);
+  set_led_strip(CRGB::Black, true);
+  set_led_strip(CRGB::Black, false);
+}
+
+
+void set_led_strip(CRGB colour, int side) {   // true is left
+  if (side) {
+    for (int i=0; i<NUM_LEDS; i++) {
+      // Turn the LED on, then pause
+      leds_l[i] = colour;
+    }
+  } else {
+    for (int i=0; i<NUM_LEDS; i++) {
+      // Turn the LED on, then pause
+      leds_r[i] = colour;
+    }
+  }
+  FastLED.show();
+}
+
+
+void police(void) {
+  static bool state = false;
+  state = !state;
+
+  if (state) {
+    set_led_strip(CRGB::Red, false);
+    set_led_strip(CRGB::Blue, true);
+  } else {
+    set_led_strip(CRGB::Blue, false);
+    set_led_strip(CRGB::Red, true);
+  }
 }
 
 

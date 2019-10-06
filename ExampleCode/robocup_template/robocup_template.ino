@@ -34,8 +34,8 @@
 
 // Task period Definitions
 // ALL OF THESE VALUES WILL NEED TO BE SET TO SOMETHING USEFUL !!!!!!!!!!!!!!!!!!!!
-#define US_SEND_TASK_PERIOD                 500
-#define IR_READ_TASK_PERIOD                 20
+#define US_SEND_TASK_PERIOD                 200
+#define IR_READ_TASK_PERIOD                 10
 #define CAM_READ_TASK_PERIOD                100
 #define TOF_READ_TASK_PERIOD                100
 #define IMU_READ_TASK_PERIOD                100
@@ -45,7 +45,8 @@
 #define WEIGHT_SCAN_TASK_PERIOD             100
 #define COLLECT_WEIGHT_TASK_PERIOD          70
 #define CHECK_WATCHDOG_TASK_PERIOD          1000
-#define VICTORY_DANCE_TASK_PERIOD           200
+#define VICTORY_DANCE_TASK_PERIOD           250
+#define POLICE_TASK_PERIOD                  250
 
 // Task execution amount definitions
 // -1 means indefinitely
@@ -61,6 +62,7 @@
 #define COLLECT_WEIGHT_TASK_NUM_EXECUTE    -1
 #define CHECK_WATCHDOG_TASK_NUM_EXECUTE    -1
 #define VICTORY_DANCE_TASK_NUM_EXECUTE     -1
+#define POLICE_TASK_NUM_EXECUTE            -1
 
 // Pin definitions
 #define IO_POWER  49
@@ -113,6 +115,7 @@ Task tCollect_weight(COLLECT_WEIGHT_TASK_PERIOD, COLLECT_WEIGHT_TASK_NUM_EXECUTE
 Task tCheck_watchdog(CHECK_WATCHDOG_TASK_PERIOD, CHECK_WATCHDOG_TASK_NUM_EXECUTE, &check_watchdog);
 Task tVictory_dance(VICTORY_DANCE_TASK_PERIOD,   VICTORY_DANCE_TASK_NUM_EXECUTE,  &victory_dance);
 
+Task tPolice(POLICE_TASK_PERIOD,                 POLICE_TASK_NUM_EXECUTE,         &police);
 Scheduler taskManager;
 
 //**********************************************************************************
@@ -126,10 +129,10 @@ void task_init();
 // put your setup code here, to run once:
 //**********************************************************************************
 void setup() {
-//  #if DEBUG
+  #if DEBUG
   Serial.begin(BAUD_RATE);
   Serial.println("\n\n Starting robot\n");
-//  #endif
+  #endif
   pin_init();
   robot_init();
   task_init();
@@ -161,8 +164,11 @@ void pin_init(){
   imu_init();
   cam_init();
   sensor_init();
-//  tof_init()
+
+  delay(100);
   gantry_init();
+
+  led_init();
   reset_imu();
   
   #if DEBUG
@@ -206,10 +212,11 @@ void task_init() {
   taskManager.addTask(tCollect_weight);
   
   taskManager.addTask(tCheck_watchdog);
-  taskManager.addTask(tVictory_dance);      
+  taskManager.addTask(tVictory_dance);
+  taskManager.addTask(tPolice);      
   
 // Enable the tasks
-//  tSend_ultrasonic.enable();
+  tSend_ultrasonic.enable();
   tRead_infrared.enable();
 //  tRead_tof.enable();
   tRead_cam.enable();
@@ -221,6 +228,7 @@ void task_init() {
   tCollect_weight.enable();
   tCheck_watchdog.enable();
 //  tVictory_dance.enable();
+  tPolice.enable();
   
   
   #if DEBUG 
@@ -239,28 +247,34 @@ void loop() {
     tCollect_weight.enable();
     tCheck_watchdog.disable();
     state_change = false;
-    led_set(RED, GREEN, BLUE, false, true, false);  // Turn on Green
+//    led_set(RED, GREEN, BLUE, false, true, false);  // Turn on Green
+//    set_led_strip(CRGB::Green, true);
+//    set_led_strip(CRGB::Green, false);
   } else if (state_change && robot_state == NO_WEIGHT) {
     tCollect_weight.disable();
     tCheck_watchdog.disable();
     state_change = false;
-    led_set(RED, GREEN, BLUE, false, false, true);  // Turn on Blue
+//    led_set(RED, GREEN, BLUE, false, false, true);  // Turn on Blue
+//    set_led_strip(CRGB::Blue, true);
+//    set_led_strip(CRGB::Blue, false);
     led_off(RED);
   } else if (state_change && robot_state == WEIGHT_AHEAD) {
     tCollect_weight.enable();
     tCheck_watchdog.enable();
     state_change = false;
-    led_set(RED, GREEN, BLUE, true, false, false);  // Turn on Red
+//    led_set(RED, GREEN, BLUE, true, false, false);  // Turn on Red
+//    set_led_strip(CRGB::Red, true);
+//    set_led_strip(CRGB::Red, false);
   } else if (robot_state == COMP_OVER) {
     if (state_change) {
       tWeight_scan.disable();
       tCollect_weight.disable();
       tCheck_watchdog.disable();
+      tPolice.disable();
+      tVictory_dance.enable();
       state_change = false;
       led_set(RED, GREEN, BLUE, false, false, false);  // Turn off
     }
-    led_toggle(GREEN);
-    delay(1000);
   }
   
   taskManager.execute();    // Execute the scheduler
