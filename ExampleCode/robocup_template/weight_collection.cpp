@@ -224,13 +224,13 @@ void victory_dance(void) {
   Serial.println("Victory dance ");
   #endif
   led_toggle(GREEN);
-//  static bool state = false;
-//  state = !state;
-//  if (state) {    
-//    set_led_strip(CRGB::Black, true);
-//    set_led_strip(CRGB::Black, false);
-//  } else {
-//    set_led_strip(CRGB::Green, true);
-//    set_led_strip(CRGB::Green, false);
-//  }
+  static bool state = false;
+  state = !state;
+  if (state) {    
+    set_led_strip(CRGB::Black, true);
+    set_led_strip(CRGB::Black, false);
+  } else {
+    set_led_strip(CRGB::Green, true);
+    set_led_strip(CRGB::Green, false);
+  }
 }

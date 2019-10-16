@@ -218,7 +218,6 @@ void task_init() {
 // Enable the tasks
   tSend_ultrasonic.enable();
   tRead_infrared.enable();
-//  tRead_tof.enable();
   tRead_cam.enable();
   tRead_imu.enable();
   tSensor_average.enable();
@@ -247,24 +246,18 @@ void loop() {
     tCollect_weight.enable();
     tCheck_watchdog.disable();
     state_change = false;
-//    led_set(RED, GREEN, BLUE, false, true, false);  // Turn on Green
-//    set_led_strip(CRGB::Green, true);
-//    set_led_strip(CRGB::Green, false);
+    led_set(RED, GREEN, BLUE, false, true, false);  // Turn on Green
   } else if (state_change && robot_state == NO_WEIGHT) {
     tCollect_weight.disable();
     tCheck_watchdog.disable();
     state_change = false;
-//    led_set(RED, GREEN, BLUE, false, false, true);  // Turn on Blue
-//    set_led_strip(CRGB::Blue, true);
-//    set_led_strip(CRGB::Blue, false);
+    led_set(RED, GREEN, BLUE, false, false, true);  // Turn on Blue
     led_off(RED);
   } else if (state_change && robot_state == WEIGHT_AHEAD) {
     tCollect_weight.enable();
     tCheck_watchdog.enable();
     state_change = false;
-//    led_set(RED, GREEN, BLUE, true, false, false);  // Turn on Red
-//    set_led_strip(CRGB::Red, true);
-//    set_led_strip(CRGB::Red, false);
+    led_set(RED, GREEN, BLUE, true, false, false);  // Turn on Red
   } else if (robot_state == COMP_OVER) {
     if (state_change) {
       tWeight_scan.disable();

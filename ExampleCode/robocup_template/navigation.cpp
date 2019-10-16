@@ -17,6 +17,7 @@
 // Local definitions
 bool in_front, to_left, to_right, left_closer, right_closer, to_right_extreme, to_left_extreme, ramp_present;
 int32_t error_int, error_prev;
+unsigned long last_change_t = 0;
 
 // Navigation sequence
 void navigate(void) {
@@ -25,14 +26,6 @@ void navigate(void) {
   #endif
   bool obstacle_present = false;
   ramp_present = !digitalRead(RAMP_L_PIN) || !digitalRead(RAMP_R_PIN);
-
-//  if (ramp_present) {
-//    led_on(RED);
-//    left_motor.writeMicroseconds(STOP_SPEED);
-//    right_motor.writeMicroseconds(STOP_SPEED);
-//    delay(5000);
-//    led_off(RED);
-//  }
   
   
   in_front     = ir_averages.front <= FRONT_LIMIT;
@@ -50,6 +43,7 @@ void navigate(void) {
       if (!obstacle_present) {
         if (cam_x < 1023) {
           weight_follow();
+          led_toggle(BLUE);
         } else {
           wall_follow();
         }
@@ -121,6 +115,7 @@ enum angle_s check_ramp(float right2left, float back2front) {
 bool obstacle_avoid(void) {
   // Checks all direction avoiding obstacles if neccessary, returns false if no obstacles found.
   bool obstacle_present = true;
+  unsigned long current_t, difference_t;
   static int blocked_ramp = 0;
   static int blocked_front = 0;
   static enum angle_s angle = FLAT;
@@ -132,7 +127,7 @@ bool obstacle_avoid(void) {
   #endif
 
 
-  if ((angle == FLAT || angle == FRWD) && blocked_ramp <= 0) {
+  if ((angle == FLAT || angle == FRWD || angle == BACK) && blocked_ramp <= 0) {
     if (in_front || ramp_present) {    // Object in front          ------------------
       #if DEBUG
       Serial.println("Object in front");
@@ -142,16 +137,21 @@ bool obstacle_avoid(void) {
         #if DEBUG
         Serial.println("Cornered, reversing\n");
         #endif
+        if (!(motor_speed_l == BACK_SLOW && motor_speed_r == BACK_SLOW)) {
+          last_change_t = millis();
+        }
         // Back up and turn around
         motor_speed_l = BACK_SLOW;
         motor_speed_r = BACK_SLOW;
         blocked_front = BLOCKED_DELAY;
-        led_on(BLUE);
         
       } else if (right_closer) {  // Object to right
         #if DEBUG
         Serial.println("Object also closer to the right, spinning left \n");
         #endif
+        if (!(motor_speed_l == BACK_SLOW && motor_speed_r == FORWARD_SLOW)) {
+          last_change_t = millis();
+        }
         // Turn left
         motor_speed_l = BACK_SLOW;
         motor_speed_r = FORWARD_SLOW;
@@ -160,6 +160,9 @@ bool obstacle_avoid(void) {
         #if DEBUG
         Serial.println("Object also closer to the left, spinning right");
         #endif
+        if (!(motor_speed_l == FORWARD_SLOW && motor_speed_r == BACK_SLOW)) {
+          last_change_t = millis();
+        }
         // Turn right
         motor_speed_l = FORWARD_SLOW;
         motor_speed_r = BACK_SLOW;
@@ -194,11 +197,13 @@ bool obstacle_avoid(void) {
           #if DEBUG
           Serial.println("Obstacles left and right, driving forward slowly \n");
           #endif
+          if (!(motor_speed_l == FORWARD_SLOW && motor_speed_r == FORWARD_SLOW)) {
+            last_change_t = millis();
+          }
           // Turn around
           motor_speed_l = FORWARD_SLOW;
           motor_speed_r = FORWARD_SLOW;
           blocked_front = 0;
-          led_off(BLUE);
         }
         
       } else if (to_left) { // Wall to left
@@ -207,6 +212,9 @@ bool obstacle_avoid(void) {
           #if DEBUG
           Serial.println("Object to the left, spinning right\n");
           #endif
+          if (!(motor_speed_l == FORWARD_SLOW && motor_speed_r == BACK_SLOW)) {
+            last_change_t = millis();
+          }
           // Turn right a little bit
           motor_speed_l = FORWARD_SLOW;
           motor_speed_r = BACK_SLOW;
@@ -214,6 +222,9 @@ bool obstacle_avoid(void) {
           #if DEBUG
           Serial.println("Object to the left, turning right gradually \n");
           #endif
+          if (!(motor_speed_l == FORWARD_SLOW && motor_speed_r == STOP_SPEED)) {
+            last_change_t = millis();
+          }
           // Turn right a little bit
           motor_speed_l = FORWARD_SLOW;
           motor_speed_r = STOP_SPEED;
@@ -225,6 +236,9 @@ bool obstacle_avoid(void) {
           #if DEBUG
           Serial.println("Object to the right, spinning left\n");
           #endif
+          if (!(motor_speed_l == BACK_SLOW && motor_speed_r == FORWARD_SLOW)) {
+            last_change_t = millis();
+          }
           // Turn right a little bit
           motor_speed_l = BACK_SLOW;
           motor_speed_r = FORWARD_SLOW;
@@ -232,6 +246,9 @@ bool obstacle_avoid(void) {
           #if DEBUG
           Serial.println("Object to the right, turning left gradually \n");
           #endif
+          if (!(motor_speed_l == STOP_SPEED && motor_speed_r == FORWARD_SLOW)) {
+            last_change_t = millis();
+          }
           // Turn right a little bit
           motor_speed_l = STOP_SPEED;
           motor_speed_r = FORWARD_SLOW;
@@ -246,16 +263,17 @@ bool obstacle_avoid(void) {
       }
     }
   } else {                                // RAMP -------------
-    if (angle == BACK) {
-      #if DEBUG
-      Serial.println("Tilted back, reversing \n");
-      #endif
-      motor_speed_l = BACK_SLOW;
-      motor_speed_r = BACK_SLOW;
-      blocked_ramp = RAMP_DELAY + REVERSE_DELAY;
-      prev_angle = angle;
-      
-    } else if (angle == BACK_RGHT) {
+//    if (angle == BACK) {
+//      #if DEBUG
+//      Serial.println("Tilted back, reversing \n");
+//      #endif
+//      motor_speed_l = BACK_SLOW;
+//      motor_speed_r = BACK_SLOW;
+//      blocked_ramp = RAMP_DELAY + REVERSE_DELAY;
+//      prev_angle = angle;
+//      
+//    } else 
+    if (angle == BACK_RGHT) {
       #if DEBUG
       Serial.println("Tilted back and to the right, reversing while turning right \n");
       #endif
@@ -307,6 +325,30 @@ bool obstacle_avoid(void) {
       }
     }
   }
+
+  current_t = millis();
+  difference_t = current_t - last_change_t;
+  #if DEBUG
+  Serial.println(difference_t);
+  #endif
+
+  if (difference_t > MAX_NO_CHANGE) {
+    #if DEBUG
+    Serial.println("WATCHDOG REACHED!! <-------------------------------\n");
+    #endif
+    led_on(RED);
+    // Back up and turn around
+    motor_speed_l = BACK_SLOW;
+    motor_speed_r = BACK_SLOW;
+    obstacle_present = true;
+    
+    if (difference_t > MAX_NO_CHANGE + 2000) {
+      last_change_t = millis();
+    }
+  } else {
+    led_off(RED);
+  }
+
 
   if (blocked_front > 0) {
     blocked_front--;
@@ -418,6 +460,7 @@ void check_watchdog(void) {
     if (counter > MAX_WAIT) {
       counter = 0;
       robot_state = NO_WEIGHT;
+      state_change = true;
     }
   }
 }
